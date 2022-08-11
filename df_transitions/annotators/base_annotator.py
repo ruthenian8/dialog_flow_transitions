@@ -4,13 +4,18 @@ Base Annotator
 This module implements an abstract base class for intent annotators.
 """
 from abc import ABC, abstractmethod
+from typing import Optional
 
 from df_engine.core import Context, Actor
 
+from ..types import IntentCollection
 from ..utils import INTENT_KEY
 
 
 class BaseAnnotator(ABC):
+    def __init__(self, intent_collection: Optional[IntentCollection] = None):
+        self.intent_collection = intent_collection
+
     @abstractmethod
     def get_intents(self, request: str) -> dict:
         raise NotImplementedError

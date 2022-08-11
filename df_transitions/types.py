@@ -1,15 +1,13 @@
 from pathlib import Path
-from typing import List, Union, Dict
+from typing import List, Dict, Optional, Any, Union
 
-from pydantic import BaseModel, Field, PrivateAttr, parse_file_as, validate_arguments, parse_obj_as
+from pydantic import BaseModel, Field, PrivateAttr, parse_file_as, parse_obj_as, validator
 from yaml import load
 
 try:
     from yaml import CSafeLoader as SafeLoader
 except ImportError:
     from yaml import SafeLoader
-
-from .utils import UnknownIntentError
 
 
 class Intent(BaseModel):
@@ -21,46 +19,83 @@ class Intent(BaseModel):
 class IntentCollection(BaseModel):
     intents: Dict[str, Intent] = Field(default_factory=dict)
 
-    def _get_path(self, file: str):
+    @classmethod
+    def _get_path(cls, file: str):
         file_path = Path(file)
         if not file_path.exists() or not file_path.is_file():
             raise OSError(f"File does not exist: {file}")
-
         return file_path
 
-    def parse_json_file(self, file: str) -> None:
-        file_path = self._get_path(file)
+    @classmethod
+    def parse_json(cls, file: str) -> None:
+        file_path = cls._get_path(file)
         intents = parse_file_as(List[Intent], file_path)
-        for intent in intents:
-            self.register_intent(intent)
+        return cls(intents=intents)
 
-    def parse_jsonl_file(self, file: str) -> None:
-        file_path = self._get_path(file)
+    @classmethod
+    def parse_jsonl(cls, file: str) -> None:
+        file_path = cls._get_path(file)
         lines = file_path.open("r", encoding="utf-8").readlines()
-        for line in lines:
-            intent = Intent.parse_raw(line)
-            self.register_intent(intent)
+        intents = [Intent.parse_raw(line) for line in lines]
+        return cls(intents=intents)
 
-    def parse_yaml_file(self, file: str) -> None:
-        file_path = self._get_path(file)
-        raw_intents = load(file_path.open("r", encoding="utf-8").read(), SafeLoader)
-        file_obj = parse_obj_as(Dict[str, List[Intent]], raw_intents)
-        intents = file_obj.get("nlu", [])
-        for intent in intents:
-            self.register_intent(intent)
+    @classmethod
+    def parse_yaml(cls, file: str) -> None:
+        file_path = cls._get_path(file)
+        raw_intents = load(file_path.open("r", encoding="utf-8").read(), SafeLoader)["intents"]
+        intents = parse_obj_as(List[Intent], raw_intents)
+        return cls(intents=intents)
 
-    @validate_arguments
-    def register_intent(self, intent: Intent) -> None:
-        intent._categorical_code = len(self.intents)
-        self.intents[intent.name] = intent
+    @validator("intents")
+    def validate_intents(cls, value: Dict[str, Intent]):
+        for idx, key in enumerate(value.keys()):
+            value[key]._categorical_code = idx
+        return value
+
+    @validator("intents", pre=True)
+    def pre_validate_intents(cls, value: Union[Dict[str, Intent], List[Intent]]):
+        if isinstance(value, list):  # if intents were passed as a list, cast them to a dict
+            intent_names = [intent.name for intent in value]
+            return {name: intent for name, intent in zip(intent_names, value)}
+        return value
 
 
-def validate_intent(self, intent: Union[str, Intent]):
-    if isinstance(intent, Intent):
-        self.intent_collection.register_intent(intent)
-        target_intent = intent.name
-    else:
-        if intent not in self.intent_collection.intents:
-            raise UnknownIntentError(f"Intent {intent} has not been registered. Use `register_intent` method.")
-        target_intent = intent
-    return target_intent
+class RasaTrainingIntent(BaseModel):
+    intent: str = Field(alias="name")
+    examples: List[str]
+
+
+class RasaTrainingData(BaseModel):
+    pipeline: List[str] = Field(default_factory=list)
+    policies: List[str] = Field(default_factory=list)
+    intents: List[str] = Field(default_factory=list)
+    entities: List[str] = Field(default_factory=list)
+    slots: Dict[str, Any] = Field(default_factory=dict)
+    actions: List[str] = Field(default_factory=list)
+    forms: Dict[str, Any] = Field(default_factory=dict)
+    e2e_actions: List[str] = Field(default_factory=list)
+    responses: Dict[str, Any] = Field(default_factory=dict)
+    session_config: Dict[str, Any] = Field(default_factory=dict)
+    nlu: List[RasaTrainingIntent]
+    rules: List[Dict[str, Any]]
+    stories: List[Dict[str, Any]]
+
+
+class RasaIntent(BaseModel):
+    confidence: float
+    name: str
+
+
+class RasaEntity(BaseModel):
+    start: int
+    end: int
+    confidence: Optional[float]
+    value: str
+    entity: str
+
+
+class RasaResponse(BaseModel):
+    text: str
+    intent_ranking: Optional[List[RasaIntent]] = None
+    intent: Optional[RasaIntent] = None
+    entities: Optional[List[RasaEntity]] = None

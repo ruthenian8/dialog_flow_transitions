@@ -1,0 +1,3 @@
+{"name": "hello", "examples": ["hi there", "hi", "hello", "hello there"]}
+{"name": "goodbye", "examples": ["bye", "see you", "goodbye"]}
+{"name": "food", "examples": ["something to eat", "have a snack", "have a meal"]}

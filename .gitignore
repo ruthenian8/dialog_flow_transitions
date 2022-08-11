@@ -17,7 +17,7 @@ opening_database*
 _globals.py
 venv*
 .vscode
+.private
 .coverage
 .pytest_cache
 htmlcov
-*.json
