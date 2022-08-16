@@ -4,7 +4,7 @@ from df_engine.core.keywords import RESPONSE, PRE_TRANSITIONS_PROCESSING, GLOBAL
 from df_engine.core import Actor
 from df_engine import conditions as cnd
 
-from df_transitions.annotators.local.classifiers.regex_scorer import RegexScorer, RegexScorerConfig
+from df_transitions.scorers.local.classifiers.regex_scorer import RegexScorer, RegexScorerConfig
 from df_transitions.types import IntentCollection
 from df_transitions import conditions as i_cnd
 
