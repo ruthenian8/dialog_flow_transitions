@@ -1,11 +1,17 @@
+"""
+HuggingFace classifier scorer
+------------------------------
+
+TODO: complete
+"""
 from typing import List
 
-from ...base_hf_annotator import BaseHFAnnotator
+from ...base_hf_scorer import BaseHFScorer
 
 
-class HFClassifierAnnotator(BaseHFAnnotator):
-    def get_intents(self, request: str) -> dict:
-        model_output = self.get_prediction(request)
+class HFClassifierScorer(BaseHFScorer):
+    def analyze(self, request: str) -> dict:
+        model_output = self.predict(request)
         logits_list: List[float] = model_output.tolist()[0]
         assert len(logits_list) == len(
             self.intent_collection.intents

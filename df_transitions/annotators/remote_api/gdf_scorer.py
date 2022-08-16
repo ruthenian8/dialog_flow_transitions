@@ -2,7 +2,9 @@ from typing import Optional
 import uuid
 from pathlib import Path
 
-from ..base_annotator import BaseAnnotator
+from pydantic import Field
+
+from ..base_scorer import BaseIntentScorer, BaseConfig
 from ...types import IntentCollection, Intent
 
 try:
@@ -16,24 +18,30 @@ except ImportError as e:
     IMPORT_ERROR_MESSAGE = e.msg
 
 
-class GoogleDialogFlowAnnotator(BaseAnnotator):
+class DialogFlowScorerConfig(BaseConfig):
+    namespace_key: str = Field(default="google_dialog_flow")
+    service_account_json: str = Field(default="")
+    language: str = "en"
+    sync_data: bool = False
+
+
+class DialogFlowScorer(BaseIntentScorer):
     def __init__(
         self,
+        config: DialogFlowScorerConfig,
         intent_collection: Optional[IntentCollection] = None,
-        service_account_json: str = "",
-        language: str = "en",
-        train_model: bool = False,
     ) -> None:
-        super().__init__(intent_collection=intent_collection)
+        IMPORT_ERROR_MESSAGE = globals().get("IMPORT_ERROR_MESSAGE")
         if IMPORT_ERROR_MESSAGE is not None:
             raise ImportError(IMPORT_ERROR_MESSAGE)
-        assert Path(service_account_json).exists(), f"Path {service_account_json} does not exist."
-        self._credentials = service_account.Credentials.from_service_account_file(service_account_json)
-        self._language = language
-        if train_model and self.intent_collection and len(self.intent_collection.intents) > 0:
+        super().__init__(config=config, intent_collection=intent_collection)
+
+        assert Path(self.service_account_json).exists(), f"Path {self.service_account_json} does not exist."
+        self._credentials = service_account.Credentials.from_service_account_file(self.service_account_json)
+        if self.sync_data and self.intent_collection and len(self.intent_collection.intents) > 0:
             self._synchronize()
 
-    def get_intents(self, request: str) -> dict:
+    def analyze(self, request: str) -> dict:
         session_id = uuid.uuid4()
         session_client = dialogflow_v2.SessionsClient(credentials=self._credentials)
         session_path = session_client.session_path(self._credentials.project_id, session_id)

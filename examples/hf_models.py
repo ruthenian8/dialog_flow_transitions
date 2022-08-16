@@ -6,7 +6,7 @@ from df_engine.core.keywords import RESPONSE, PRE_TRANSITIONS_PROCESSING, GLOBAL
 from df_engine.core import Actor
 from df_engine import conditions as cnd
 
-from df_transitions.annotators import HFProximityAnnotator, HFClassifierAnnotator
+from df_transitions.annotators import HFClassifierScorer, HFCosineScorer, HFScorerConfig
 from df_transitions.types import IntentCollection
 from df_transitions import conditions as i_cnd
 
@@ -17,18 +17,23 @@ logger = logging.getLogger(__name__)
 tokenizer = AutoTokenizer("bert-base-uncased")
 model = AutoModelForSequenceClassification("my-classification-model")
 
-annotator_1 = HFClassifierAnnotator(
-    tokenizer=tokenizer, model=model, intent_collection=IntentCollection.parse_yaml("./data/example.yaml")
+common_intent_collection = IntentCollection.parse_yaml("./data/example.yaml")
+
+annotator_1 = HFClassifierScorer(
+    config=HFScorerConfig(tokenizer=tokenizer, model=model, namespace_key="hf_classifier"),
+    intent_collection=common_intent_collection,
 )
-annotator_2 = HFProximityAnnotator(
-    tokenizer=tokenizer, model=model, intent_collection=IntentCollection.parse_yaml("./data/example.yaml")
+
+annotator_2 = HFCosineScorer(
+    config=HFScorerConfig(tokenizer=tokenizer, model=model, namespace_key="hf_matcher"),
+    intent_collection=common_intent_collection,
 )
 
 
 script = {
     GLOBAL: {
         PRE_TRANSITIONS_PROCESSING: {"get_intents_1": annotator_1, "get_intents_2": annotator_2},
-        TRANSITIONS: {("food", "offer", 2): i_cnd.user_has_intent("food")},
+        TRANSITIONS: {("food", "offer", 1.2): i_cnd.intent_detected("food")},
     },
     "root": {
         LOCAL: {TRANSITIONS: {("service", "offer", 1.2): cnd.true()}},

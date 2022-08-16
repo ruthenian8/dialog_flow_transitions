@@ -1,6 +1,13 @@
-import os
-
 import pytest
+
+try:
+    import unknown_package
+
+    IMPORT_ERROR_MESSAGE = None
+except ImportError as e:
+    unknown_package = None
+    IMPORT_ERROR_MESSAGE = e.msg
+
 
 from df_transitions.types import IntentCollection
 

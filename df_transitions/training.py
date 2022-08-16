@@ -20,7 +20,7 @@ class IntentDataset(Dataset):
         self._data = []
         for intent in intent_collection.items.values():
             intent: Intent
-            for sentence in intent.positive_examples:
+            for sentence in intent.examples:
                 self._data += [(tokenizer(sentence), intent._categorical_code)]
 
     def __getitem__(self, idx):

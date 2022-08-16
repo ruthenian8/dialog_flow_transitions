@@ -4,7 +4,7 @@ from df_engine.core.keywords import RESPONSE, PRE_TRANSITIONS_PROCESSING, GLOBAL
 from df_engine.core import Actor
 from df_engine import conditions as cnd
 
-from df_transitions.annotators import RegexAnnotator
+from df_transitions.annotators.local.classifiers.regex_scorer import RegexScorer, RegexScorerConfig
 from df_transitions.types import IntentCollection
 from df_transitions import conditions as i_cnd
 
@@ -12,13 +12,15 @@ from examples import example_utils
 
 logger = logging.getLogger(__name__)
 
-annotator = RegexAnnotator(intent_collection=IntentCollection.parse_yaml("./data/example.yaml"), case_sensitive=False)
+regex_scorer = RegexScorer(
+    config=RegexScorerConfig(), intent_collection=IntentCollection.parse_yaml("examples/data/example.yaml")
+)
 
 
 script = {
     GLOBAL: {
-        PRE_TRANSITIONS_PROCESSING: {"get_intents": annotator},
-        TRANSITIONS: {("food", "offer", 2): i_cnd.user_has_intent("food")},
+        PRE_TRANSITIONS_PROCESSING: {"get_intents": regex_scorer},
+        TRANSITIONS: {("food", "offer", 1.2): i_cnd.intent_detected("food")},
     },
     "root": {
         LOCAL: {TRANSITIONS: {("service", "offer", 1.2): cnd.true()}},
@@ -43,6 +45,18 @@ script = {
 }
 
 actor = Actor(script, start_label=("root", "start"), fallback_label=("root", "fallback"))
+
+
+testing_dialogue = [
+    ("hi", "What would you like me to look up?"),
+    ("get something to eat", "Would you like me to look up a restaurant for you?"),
+    ("yes", "Sorry, all the restaurants are closed due to COVID restrictions."),
+    ("ok", "Ok, see you soon!"),
+    ("bye", "Hi!"),
+    ("hi", "What would you like me to look up?"),
+    ("place to sleep", "I can't quite get what you mean."),
+    ("ok", "What would you like me to look up?"),
+]
 
 
 def main():

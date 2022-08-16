@@ -1,1 +1,0 @@
-from .hf_classifier_annotator import HFClassifierAnnotator

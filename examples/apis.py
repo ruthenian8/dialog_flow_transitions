@@ -4,7 +4,7 @@ from df_engine.core.keywords import RESPONSE, PRE_TRANSITIONS_PROCESSING, GLOBAL
 from df_engine.core import Actor
 from df_engine import conditions as cnd
 
-from df_transitions.annotators import GoogleDialogFlowAnnotator, RasaAnnotator, HFApiAnnotator
+from df_transitions.annotators import DialogFlowScorer, DialogFlowScorerConfig, RasaScorer, RasaScorerConfig
 from df_transitions.types import IntentCollection
 from df_transitions import conditions as i_cnd
 
@@ -12,23 +12,26 @@ from examples import example_utils
 
 logger = logging.getLogger(__name__)
 
-gdf_annotator = GoogleDialogFlowAnnotator(
-    intent_collection=IntentCollection.parse_yaml("./data/example.yaml"),
-    service_account_json="service-account-credentials.json",
-    train_model=True,
+common_intent_collection = IntentCollection.parse_yaml("./data/example.yaml")
+
+gdf_scorer = DialogFlowScorer(
+    intent_collection=common_intent_collection,
+    config=DialogFlowScorerConfig(
+        service_account_json="service-account-credentials.json",
+        sync_data=False,
+    ),
 )
 
-hf_annotator = HFApiAnnotator(model="arbitrary-intent-classifier", api_key="my-api-key")
-
-rasa_annotator = RasaAnnotator(url="https://my-rasa-server/", api_key="my-api-token")
+rasa_scorer = RasaScorer(
+    intent_collection=common_intent_collection,
+    config=RasaScorerConfig(url="https://my-rasa-server/", api_key="my-api-token"),
+)
 
 
 script = {
     GLOBAL: {
-        PRE_TRANSITIONS_PROCESSING: {
-            "get_intents_1": gdf_annotator,
-        },
-        TRANSITIONS: {("food", "offer", 2): i_cnd.user_has_intent("food")},
+        PRE_TRANSITIONS_PROCESSING: {"get_intents_1": gdf_scorer, "get_intents_2": rasa_scorer},
+        TRANSITIONS: {("food", "offer", 1.2): i_cnd.intent_detected("food")},
     },
     "root": {
         LOCAL: {TRANSITIONS: {("service", "offer", 1.2): cnd.true()}},

@@ -9,7 +9,7 @@ import time
 import json
 from urllib.parse import urljoin
 from typing import List, Optional
-from pydantic import parse_obj_as
+from pydantic import parse_obj_as, Field, validator, root_validator
 
 from yaml import dump
 import requests
@@ -20,42 +20,51 @@ except ImportError:
     from yaml import Dumper
 
 from ...types import IntentCollection, RasaResponse, RasaTrainingIntent, RasaTrainingData
-from ..base_annotator import BaseAnnotator
+from ..base_scorer import BaseIntentScorer, BaseConfig
 from ...utils import STATUS_SUCCESS, STATUS_UNAVAILABLE
 
 
 DEFAULT_SESSION_CONFIG = {"session_expiration_time": 60, "carry_over_slots_to_new_session": True}
 
 
-class RasaAnnotator(BaseAnnotator):
-    def __init__(
-        self,
-        url: str,
-        intent_collection: Optional[IntentCollection] = None,
-        api_key: Optional[str] = None,
-        jwt_token: Optional[str] = None,
-        retries: int = 10,
-    ):
-        super().__init__(intent_collection=intent_collection)
-        self._url = url
-        parse_endpoint = "model/parse" + (f"?token={api_key}" if api_key else "")
-        train_endpoint = "model/train" + (f"?token={api_key}" if api_key else "")
-        self._parse_url = urljoin(url, parse_endpoint)
-        self._train_url = urljoin(url, train_endpoint)
-        self._retries = retries
-        self._default_headers = {"Content-Type": "application/json"}
-        if jwt_token != None:
-            self._default_headers["Authorization"] = "Bearer " + jwt_token
+class RasaScorerConfig(BaseConfig):
+    url: str
+    api_key: Optional[str] = None
+    jwt_token: Optional[str] = None
+    retries: int = Field(default=10)
+    parse_url: str = ""
+    train_url: str = ""
+    headers: dict = Field(default_factory=dict, alias="headers")
+    namespace_key: str = "rasa_scorer"
 
-    def get_intents(self, request: str) -> dict:
+    @validator("headers")
+    def validate_rasa_headers(cls, headers: dict, values: dict):
+        headers.update({"Content-Type": "application/json"})
+        jwt_token = values.get("jwt_token")
+        if jwt_token is not None:
+            headers["Authorization"] = "Bearer " + jwt_token
+        return headers
+
+    @root_validator
+    def get_urls(cls, values: dict) -> dict:
+        base_url = values.get("url")
+        api_key = values.get("api_key")
+        values["parse_url"] = urljoin(base_url, ("model/parse" + (f"?token={api_key}" if api_key else "")))
+        values["train_url"] = urljoin(base_url, ("model/train" + (f"?token={api_key}" if api_key else "")))
+        return values
+
+
+class RasaScorer(BaseIntentScorer):
+    def __init__(self, config: RasaScorerConfig, intent_collection: Optional[IntentCollection] = None):
+        super().__init__(config=config, intent_collection=intent_collection)
+
+    def analyze(self, request: str) -> dict:
         message_id = uuid.uuid4()
         message = {"message_id": message_id, "text": request}
         retries = 0
-        while retries < self._retries:
+        while retries < self.retries:
             retries += 1
-            response: requests.Response = requests.post(
-                self._parse_url, headers=self._default_headers, data=json.dumps(message)
-            )
+            response: requests.Response = requests.post(self.parse_url, headers=self.headers, data=json.dumps(message))
             if response.status_code == STATUS_UNAVAILABLE:
                 time.sleep(1)
             elif response.status_code == STATUS_SUCCESS:
@@ -77,7 +86,7 @@ class RasaAnnotator(BaseAnnotator):
             nlu=parse_obj_as(List[RasaTrainingIntent], list(self.intent_collection.intents.values())),
         )
         yaml_data = dump(data.dict(by_alias=False), Dumper=Dumper)
-        headers = {**self._default_headers, "Content-Type": "application/yaml"}
+        headers = {**self.headers, "Content-Type": "application/yaml"}
         response: requests.Response = requests.post(headers=headers, data=yaml_data)
         if not response.status_code == 200 and not response.status_code == 204:
             raise requests.HTTPError(str(response.status_code) + " " + response.text)
