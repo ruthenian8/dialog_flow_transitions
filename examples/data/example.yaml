@@ -1,4 +1,4 @@
-intents:
+labels:
   - name: hello
     examples:
       - hi there

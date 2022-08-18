@@ -2,53 +2,57 @@
 Conditions
 -----------
 
-This module provides condition functions for intent processing.
+This module provides condition functions for label processing.
 """
-from typing import Callable
+from typing import Callable, Optional
 from functools import singledispatch
 
 from df_engine.core import Context, Actor
 
-from .types import Intent
+from .types import Label
 from .utils import INTENT_KEY
 
 
 @singledispatch
-def intent_detected(intent, threshold: float = 0.95):
+def has_cls_label(label, namespace: Optional[str] = None):
     raise NotImplementedError
 
 
-@intent_detected.register(str)
-def _(intent, threshold: float = 0.95):
-    def intent_detected_innner(ctx: Context, actor: Actor) -> bool:
+@has_cls_label.register(str)
+def _(label, namespace: Optional[str] = None):
+    def has_cls_label_innner(ctx: Context, actor: Actor) -> bool:
         if INTENT_KEY not in ctx.framework_states:
             return False
-        scores = [item.get(intent, 0) for item in ctx.framework_states[INTENT_KEY].values()]
-        comparison_array = [item >= threshold for item in scores]
+        if namespace is not None:
+            return ctx.framework_states[INTENT_KEY].get(namespace, {}).get(label, 0) >= 1.0
+        scores = [item.get(label, 0) for item in ctx.framework_states[INTENT_KEY].values()]
+        comparison_array = [item >= 1.0 for item in scores]
         return any(comparison_array)
 
-    return intent_detected_innner
+    return has_cls_label_innner
 
 
-@intent_detected.register(Intent)
-def _(intent, threshold: float = 0.95) -> Callable[[Context, Actor], bool]:
-    def intent_detected_innner(ctx: Context, actor: Actor) -> bool:
+@has_cls_label.register(Label)
+def _(label, namespace: Optional[str] = None) -> Callable[[Context, Actor], bool]:
+    def has_cls_label_innner(ctx: Context, actor: Actor) -> bool:
         if INTENT_KEY not in ctx.framework_states:
             return False
-        scores = [item.get(intent.name, 0) for item in ctx.framework_states[INTENT_KEY].values()]
-        comparison_array = [item >= threshold for item in scores]
+        if namespace is not None:
+            return ctx.framework_states[INTENT_KEY].get(namespace, {}).get(label.name, 0) >= 1.0
+        scores = [item.get(label.name, 0) for item in ctx.framework_states[INTENT_KEY].values()]
+        comparison_array = [item >= 1.0 for item in scores]
         return any(comparison_array)
 
-    return intent_detected_innner
+    return has_cls_label_innner
 
 
-@intent_detected.register(list)
-def _(intent, threshold: float = 0.95):
-    def intent_detected_innner(ctx: Context, actor: Actor) -> bool:
-        scores = [intent_detected(item)(ctx, actor) for item in intent]
+@has_cls_label.register(list)
+def _(label, namespace: Optional[str] = None):
+    def has_cls_label_innner(ctx: Context, actor: Actor) -> bool:
+        scores = [has_cls_label(item, namespace)(ctx, actor) for item in label]
         for score in scores:
-            if score >= threshold:
+            if score >= 1.0:
                 return True
         return False
 
-    return intent_detected_innner
+    return has_cls_label_innner

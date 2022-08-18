@@ -6,8 +6,9 @@ from df_engine.core.keywords import RESPONSE, PRE_TRANSITIONS_PROCESSING, GLOBAL
 from df_engine.core import Actor
 from df_engine import conditions as cnd
 
-from df_transitions.annotators import HFClassifierScorer, HFCosineScorer, HFScorerConfig
-from df_transitions.types import IntentCollection
+from df_transitions.scorers.local.classifiers.hf_classifier import HFClassifier
+from df_transitions.scorers.local.cosine_scorers.hf_scorer import HFCosineScorer
+from df_transitions.types import LabelCollection
 from df_transitions import conditions as i_cnd
 
 from examples import example_utils
@@ -17,23 +18,21 @@ logger = logging.getLogger(__name__)
 tokenizer = AutoTokenizer("bert-base-uncased")
 model = AutoModelForSequenceClassification("my-classification-model")
 
-common_intent_collection = IntentCollection.parse_yaml("./data/example.yaml")
+common_label_collection = LabelCollection.parse_yaml("./data/example.yaml")
 
-annotator_1 = HFClassifierScorer(
-    config=HFScorerConfig(tokenizer=tokenizer, model=model, namespace_key="hf_classifier"),
-    intent_collection=common_intent_collection,
+annotator_1 = HFClassifier(
+    namespace_key="hf_classifier", label_collection=common_label_collection, tokenizer=tokenizer, model=model
 )
 
 annotator_2 = HFCosineScorer(
-    config=HFScorerConfig(tokenizer=tokenizer, model=model, namespace_key="hf_matcher"),
-    intent_collection=common_intent_collection,
+    namespace_key="hf_matcher", label_collection=common_label_collection, tokenizer=tokenizer, model=model
 )
 
 
 script = {
     GLOBAL: {
         PRE_TRANSITIONS_PROCESSING: {"get_intents_1": annotator_1, "get_intents_2": annotator_2},
-        TRANSITIONS: {("food", "offer", 1.2): i_cnd.intent_detected("food")},
+        TRANSITIONS: {("food", "offer", 1.2): i_cnd.has_cls_label("food")},
     },
     "root": {
         LOCAL: {TRANSITIONS: {("service", "offer", 1.2): cnd.true()}},

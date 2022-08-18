@@ -4,34 +4,35 @@ from df_engine.core.keywords import RESPONSE, PRE_TRANSITIONS_PROCESSING, GLOBAL
 from df_engine.core import Actor
 from df_engine import conditions as cnd
 
-from df_transitions.annotators import DialogFlowScorer, DialogFlowScorerConfig, RasaScorer, RasaScorerConfig
-from df_transitions.types import IntentCollection
+from df_transitions.scorers.remote_api.gdf_scorer import DialogFlowScorer
+from df_transitions.scorers.remote_api.rasa_scorer import RasaScorer
+from df_transitions.types import LabelCollection
 from df_transitions import conditions as i_cnd
 
 from examples import example_utils
 
 logger = logging.getLogger(__name__)
 
-common_intent_collection = IntentCollection.parse_yaml("./data/example.yaml")
+common_label_collection = LabelCollection.parse_yaml("./data/example.yaml")
 
 gdf_scorer = DialogFlowScorer(
-    intent_collection=common_intent_collection,
-    config=DialogFlowScorerConfig(
-        service_account_json="service-account-credentials.json",
-        sync_data=False,
-    ),
+    namespace_key="gdf",
+    label_collection=common_label_collection,
+    service_account_json="service-account-credentials.json",
+    sync_data=False,
 )
 
 rasa_scorer = RasaScorer(
-    intent_collection=common_intent_collection,
-    config=RasaScorerConfig(url="https://my-rasa-server/", api_key="my-api-token"),
+    namespace_key="rasa",
+    label_collection=common_label_collection,
+    url="https://my-rasa-server/",
+    api_key="my-api-token",
 )
-
 
 script = {
     GLOBAL: {
         PRE_TRANSITIONS_PROCESSING: {"get_intents_1": gdf_scorer, "get_intents_2": rasa_scorer},
-        TRANSITIONS: {("food", "offer", 1.2): i_cnd.intent_detected("food")},
+        TRANSITIONS: {("food", "offer", 1.2): i_cnd.has_cls_label("food")},
     },
     "root": {
         LOCAL: {TRANSITIONS: {("service", "offer", 1.2): cnd.true()}},

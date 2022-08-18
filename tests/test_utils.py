@@ -9,7 +9,7 @@ except ImportError as e:
     IMPORT_ERROR_MESSAGE = e.msg
 
 
-from df_transitions.types import IntentCollection
+from df_transitions.types import LabelCollection
 
 
 @pytest.mark.parametrize(
@@ -21,10 +21,10 @@ from df_transitions.types import IntentCollection
     ],
 )
 def test_file_parsing(file, method_name):
-    collection: IntentCollection = getattr(IntentCollection, method_name)(file)
-    assert len(collection.intents) == 3
+    collection: LabelCollection = getattr(LabelCollection, method_name)(file)
+    assert len(collection.labels) == 3
     prev_categorical_code = -1
-    for intent in collection.intents.values():
+    for intent in collection.labels.values():
         assert len(intent.examples) >= 3
         assert intent._categorical_code != prev_categorical_code
         prev_categorical_code = intent._categorical_code

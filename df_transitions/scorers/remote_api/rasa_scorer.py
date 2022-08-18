@@ -19,46 +19,34 @@ try:
 except ImportError:
     from yaml import Dumper
 
-from ...types import IntentCollection, RasaResponse, RasaTrainingIntent, RasaTrainingData
-from ..base_scorer import BaseIntentScorer, BaseConfig
+from ...types import LabelCollection, RasaResponse, RasaTrainingIntent, RasaTrainingData
+from ..base_scorer import BaseScorer, BaseConfig
 from ...utils import STATUS_SUCCESS, STATUS_UNAVAILABLE
 
 
 DEFAULT_SESSION_CONFIG = {"session_expiration_time": 60, "carry_over_slots_to_new_session": True}
 
 
-class RasaScorerConfig(BaseConfig):
-    url: str
-    api_key: Optional[str] = None
-    jwt_token: Optional[str] = None
-    retries: int = Field(default=10)
-    parse_url: str = ""
-    train_url: str = ""
-    headers: dict = Field(default_factory=dict, alias="headers")
-    namespace_key: str = "rasa_scorer"
-
-    @validator("headers")
-    def validate_rasa_headers(cls, headers: dict, values: dict):
-        headers.update({"Content-Type": "application/json"})
-        jwt_token = values.get("jwt_token")
+class RasaScorer(BaseScorer):
+    def __init__(
+        self,
+        namespace_key: str,
+        label_collection: Optional[LabelCollection],
+        url: str,
+        api_key: Optional[str],
+        jwt_token: Optional[str] = None,
+        retries: int = 10,
+        headers: Optional[dict] = None,
+    ):
+        super().__init__(namespace_key=namespace_key, label_collection=label_collection)
+        self.headers = headers or {"Content-Type": "application/json"}
+        self.parse_url = urljoin(url, ("model/parse" + (f"?token={api_key}" if api_key else "")))
+        self.train_url = urljoin(url, ("model/train" + (f"?token={api_key}" if api_key else "")))
         if jwt_token is not None:
-            headers["Authorization"] = "Bearer " + jwt_token
-        return headers
+            self.headers["Authorization"] = "Bearer " + jwt_token
+        self.retries = retries
 
-    @root_validator
-    def get_urls(cls, values: dict) -> dict:
-        base_url = values.get("url")
-        api_key = values.get("api_key")
-        values["parse_url"] = urljoin(base_url, ("model/parse" + (f"?token={api_key}" if api_key else "")))
-        values["train_url"] = urljoin(base_url, ("model/train" + (f"?token={api_key}" if api_key else "")))
-        return values
-
-
-class RasaScorer(BaseIntentScorer):
-    def __init__(self, config: RasaScorerConfig, intent_collection: Optional[IntentCollection] = None):
-        super().__init__(config=config, intent_collection=intent_collection)
-
-    def analyze(self, request: str) -> dict:
+    def predict(self, request: str) -> dict:
         message_id = uuid.uuid4()
         message = {"message_id": message_id, "text": request}
         retries = 0
@@ -82,8 +70,8 @@ class RasaScorer(BaseIntentScorer):
         Dispatches a request to the RASA server to train an nlu model and returns the name of the obtained file.
         """
         data = RasaTrainingData(
-            intents=list(self.intent_collection.intents.keys()),
-            nlu=parse_obj_as(List[RasaTrainingIntent], list(self.intent_collection.intents.values())),
+            intents=list(self.label_collection.intents.keys()),
+            nlu=parse_obj_as(List[RasaTrainingIntent], list(self.label_collection.intents.values())),
         )
         yaml_data = dump(data.dict(by_alias=False), Dumper=Dumper)
         headers = {**self.headers, "Content-Type": "application/yaml"}

@@ -4,23 +4,22 @@ from df_engine.core.keywords import RESPONSE, PRE_TRANSITIONS_PROCESSING, GLOBAL
 from df_engine.core import Actor
 from df_engine import conditions as cnd
 
-from df_transitions.scorers.local.classifiers.regex_scorer import RegexScorer, RegexScorerConfig
-from df_transitions.types import IntentCollection
+from df_transitions.scorers.local.classifiers.regex_classifier import RegexClassifier
+from df_transitions.types import LabelCollection
 from df_transitions import conditions as i_cnd
 
 from examples import example_utils
 
 logger = logging.getLogger(__name__)
 
-regex_scorer = RegexScorer(
-    config=RegexScorerConfig(), intent_collection=IntentCollection.parse_yaml("examples/data/example.yaml")
+regex_scorer = RegexClassifier(
+    namespace_key="regex", label_collection=LabelCollection.parse_yaml("examples/data/example.yaml")
 )
-
 
 script = {
     GLOBAL: {
         PRE_TRANSITIONS_PROCESSING: {"get_intents": regex_scorer},
-        TRANSITIONS: {("food", "offer", 1.2): i_cnd.intent_detected("food")},
+        TRANSITIONS: {("food", "offer", 1.2): i_cnd.has_cls_label("food")},
     },
     "root": {
         LOCAL: {TRANSITIONS: {("service", "offer", 1.2): cnd.true()}},

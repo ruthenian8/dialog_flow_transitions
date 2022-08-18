@@ -5,23 +5,27 @@ Training
 This module contains utilities for HuggingFace classifier fine-tuning.
 """
 try:
+    IMPORT_ERROR_MESSAGE = None
     from torch.utils.data import Dataset
-except ImportError:
+    from tokenizers import Tokenizer
+except ImportError as e:
+    IMPORT_ERROR_MESSAGE = e.msg
     Dataset = object
+    Tokenizer = object
 
-from tokenizers import Tokenizer
-
-from .types import Intent, IntentCollection
+from .types import Label, LabelCollection
 
 
 class IntentDataset(Dataset):
-    def __init__(self, tokenizer: Tokenizer, intent_collection: IntentCollection) -> None:
+    def __init__(self, tokenizer: Tokenizer, label_collection: LabelCollection) -> None:
+        if IMPORT_ERROR_MESSAGE is not None:
+            raise ImportError(IMPORT_ERROR_MESSAGE)
         super().__init__()
         self._data = []
-        for intent in intent_collection.items.values():
-            intent: Intent
-            for sentence in intent.examples:
-                self._data += [(tokenizer(sentence), intent._categorical_code)]
+        for label in label_collection.labels.values():
+            label: Label
+            for sentence in label.examples:
+                self._data += [(tokenizer(sentence), label._categorical_code)]
 
     def __getitem__(self, idx):
         return self._data[idx]

@@ -3,42 +3,35 @@ import json
 from typing import Optional
 from urllib.parse import urljoin
 
-from pydantic import Field, root_validator, validator
 import requests
 
-from ...types import IntentCollection
+from ...types import LabelCollection
 from ...utils import STATUS_SUCCESS, STATUS_UNAVAILABLE
-from ..base_scorer import BaseIntentScorer, BaseConfig
+from ..base_scorer import BaseScorer
 
 
-class HFApiScorerConfig(BaseConfig):
-    api_key: str
-    model: Optional[str] = Field(default=None)
-    headers: dict = Field(default_factory=dict)
-    retries: int = Field(default=60)
-    url: Optional[str] = Field(default=None)
-    namespace_key: str = "hugging_face_inference_api"
+class HFApiScorer(BaseScorer):
+    def __init__(
+        self,
+        namespace_key: str,
+        label_collection: Optional[LabelCollection],
+        api_key: str,
+        model: Optional[str] = None,
+        url: Optional[str] = None,
+        headers: Optional[dict] = None,
+        retries: int = 60,
+    ) -> None:
+        super().__init__(namespace_key=namespace_key, label_collection=label_collection)
+        assert model or url, "setting model or url is required"
+        self.api_key = api_key
+        self.model = model
+        self.headers = (
+            headers if headers else {"Authorization": "Bearer " + api_key, "Content-Type": "application/json"}
+        )
+        self.retries = retries
+        self.url = url if url else urljoin("https://api-inference.huggingface.co/models/", model)
 
-    @validator("headers")
-    def validate_hf_headers(cls, headers: dict, values: dict):
-        api_key = values.get("api_key")
-        headers.update({"Authorization": "Bearer " + api_key, "Content-Type": "application/json"})
-        return headers
-
-    @root_validator(pre=True)
-    def validate_url(cls, values: dict):
-        url, model = values.get("url"), values.get("model")
-        if not url and not model:
-            raise ValueError("Model url or model name must be specified.")
-        values["url"] = url or urljoin("https://api-inference.huggingface.co/models/", model)
-        return values
-
-
-class HFApiScorer(BaseIntentScorer):
-    def __init__(self, config: HFApiScorerConfig, intent_collection: Optional[IntentCollection] = None):
-        super().__init__(config=config, intent_collection=intent_collection)
-
-    def analyze(self, request: str) -> dict:
+    def predict(self, request: str) -> dict:
         retries = 0
         while retries < self.retries:
             retries += 1

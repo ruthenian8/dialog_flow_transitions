@@ -2,10 +2,8 @@ from typing import Optional
 import uuid
 from pathlib import Path
 
-from pydantic import Field
-
-from ..base_scorer import BaseIntentScorer, BaseConfig
-from ...types import IntentCollection, Intent
+from ..base_scorer import BaseScorer, BaseConfig
+from ...types import LabelCollection, Label
 
 try:
     from google.cloud import dialogflow_v2
@@ -18,30 +16,27 @@ except ImportError as e:
     IMPORT_ERROR_MESSAGE = e.msg
 
 
-class DialogFlowScorerConfig(BaseConfig):
-    namespace_key: str = Field(default="google_dialog_flow")
-    service_account_json: str = Field(default="")
-    language: str = "en"
-    sync_data: bool = False
-
-
-class DialogFlowScorer(BaseIntentScorer):
+class DialogFlowScorer(BaseScorer):
     def __init__(
         self,
-        config: DialogFlowScorerConfig,
-        intent_collection: Optional[IntentCollection] = None,
+        namespace_key: str,
+        label_collection: Optional[LabelCollection],
+        service_account_json: str,
+        language: str = "en",
+        sync_data: bool = False,
     ) -> None:
         IMPORT_ERROR_MESSAGE = globals().get("IMPORT_ERROR_MESSAGE")
         if IMPORT_ERROR_MESSAGE is not None:
             raise ImportError(IMPORT_ERROR_MESSAGE)
-        super().__init__(config=config, intent_collection=intent_collection)
+        super().__init__(namespace_key=namespace_key, label_collection=label_collection)
+        self._language = language
 
-        assert Path(self.service_account_json).exists(), f"Path {self.service_account_json} does not exist."
-        self._credentials = service_account.Credentials.from_service_account_file(self.service_account_json)
-        if self.sync_data and self.intent_collection and len(self.intent_collection.intents) > 0:
+        assert Path(service_account_json).exists(), f"Path {service_account_json} does not exist."
+        self._credentials = service_account.Credentials.from_service_account_file(service_account_json)
+        if sync_data and self.label_collection and len(self.label_collection.labels) > 0:
             self._synchronize()
 
-    def analyze(self, request: str) -> dict:
+    def predict(self, request: str) -> dict:
         session_id = uuid.uuid4()
         session_client = dialogflow_v2.SessionsClient(credentials=self._credentials)
         session_path = session_client.session_path(self._credentials.project_id, session_id)
@@ -59,17 +54,17 @@ class DialogFlowScorer(BaseIntentScorer):
         intent_path = client.intent_path(self._credentials.project_id, intent_id)
         client.delete_intent(request={"name": intent_path})
 
-    def _save_intent(self, intent: Intent) -> None:
+    def _save_intent(self, label: Label) -> None:
         intents_client = dialogflow_v2.IntentsClient(credentials=self._credentials)
         agent_path = dialogflow_v2.AgentsClient.agent_path(self._credentials.project_id)
 
         phrases = []
-        for training_phrases_part in intent.examples:
+        for training_phrases_part in label.examples:
             part = dialogflow_v2.Intent.TrainingPhrase.Part(text=training_phrases_part)
             training_phrase = dialogflow_v2.Intent.TrainingPhrase(parts=[part])
             phrases.append(training_phrase)
 
-        df_intent = dialogflow_v2.Intent(display_name=intent.name, training_phrases=phrases)
+        df_intent = dialogflow_v2.Intent(display_name=label.name, training_phrases=phrases)
 
         response = intents_client.create_intent(request={"parent": agent_path, "intent": df_intent})
 
@@ -78,7 +73,7 @@ class DialogFlowScorer(BaseIntentScorer):
         agent_path = dialogflow_v2.AgentsClient.agent_path(self._credentials.project_id)
 
         current_intents = intents_client.list_intents(request={"parent": agent_path})
-        registered_intents = self.intent_collection.intents.copy()
+        registered_intents = self.label_collection.labels.copy()
 
         for intent in current_intents:
             if intent.display_name in registered_intents:
