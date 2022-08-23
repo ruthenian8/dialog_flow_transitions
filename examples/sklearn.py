@@ -3,8 +3,11 @@ import logging
 from df_engine.core.keywords import RESPONSE, PRE_TRANSITIONS_PROCESSING, GLOBAL, TRANSITIONS, LOCAL
 from df_engine.core import Actor
 from df_engine import conditions as cnd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.linear_model import LogisticRegression
 
-from df_transitions.scorers.local.classifiers.regex import RegexClassifier
+from df_transitions.scorers.local.classifiers.sklearn import SklearnClassifier
+from df_transitions.scorers.local.cosine_scorers.sklearn import SklearnScorer
 from df_transitions.types import LabelCollection
 from df_transitions import conditions as i_cnd
 
@@ -12,14 +15,19 @@ from examples import example_utils
 
 logger = logging.getLogger(__name__)
 
-regex_scorer = RegexClassifier(
-    namespace_key="regex", label_collection=LabelCollection.parse_yaml("examples/data/example.yaml")
-)
+classifier = SklearnClassifier(tokenizer=TfidfVectorizer(), model=LogisticRegression())
+classifier.fit(LabelCollection.parse_yaml("examples/data/labesl.yaml"))
+Scorer = SklearnScorer(tokenizer=TfidfVectorizer())
+Scorer.fit(LabelCollection.parse_yaml("examples/data/labesl.yaml"))
+
 
 script = {
     GLOBAL: {
-        PRE_TRANSITIONS_PROCESSING: {"get_intents": regex_scorer},
-        TRANSITIONS: {("food", "offer", 1.2): i_cnd.has_cls_label("food")},
+        # PRE_TRANSITIONS_PROCESSING: {"get_intents": regex_scorer},
+        TRANSITIONS: {
+            ("food", "offer", 1.2): i_cnd.has_cls_label("food"),
+            ("food", "offer", 1.2): i_cnd.has_match(Scorer, ["I want to eat"]),
+        },
     },
     "root": {
         LOCAL: {TRANSITIONS: {("service", "offer", 1.2): cnd.true()}},

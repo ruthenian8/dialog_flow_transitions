@@ -2,7 +2,6 @@ import pytest
 
 try:
     import unknown_package
-
     IMPORT_ERROR_MESSAGE = None
 except ImportError as e:
     unknown_package = None

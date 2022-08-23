@@ -6,8 +6,8 @@ from df_engine.core.keywords import RESPONSE, PRE_TRANSITIONS_PROCESSING, GLOBAL
 from df_engine.core import Actor
 from df_engine import conditions as cnd
 
-from df_transitions.scorers.local.classifiers.hf_classifier import HFClassifier
-from df_transitions.scorers.local.cosine_scorers.hf_scorer import HFCosineScorer
+from df_transitions.scorers.local.classifiers.huggingface import HFClassifier
+from df_transitions.scorers.local.cosine_scorers.huggingface import HFCosineScorer
 from df_transitions.types import LabelCollection
 from df_transitions import conditions as i_cnd
 

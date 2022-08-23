@@ -4,13 +4,16 @@ Conditions
 
 This module provides condition functions for label processing.
 """
-from typing import Callable, Optional
+from typing import Callable, Optional, List
 from functools import singledispatch
 
+from sklearn.metrics.pairwise import cosine_similarity
+from pydantic import validate_arguments
 from df_engine.core import Context, Actor
 
 from .types import Label
 from .utils import INTENT_KEY
+from .scorers.base_scorer import BaseScorer
 
 
 @singledispatch
@@ -56,3 +59,28 @@ def _(label, namespace: Optional[str] = None):
         return False
 
     return has_cls_label_innner
+
+
+@validate_arguments
+def has_match(
+    scorer: BaseScorer,
+    positive_examples: Optional[List[str]],
+    negative_examples: Optional[List[str]] = None,
+    threshold: float = 0.9,
+):
+    if negative_examples is None:
+        negative_examples = []
+
+    def has_match_inner(ctx: Context, actor: Actor) -> bool:
+        if not isinstance(ctx.last_request, str):
+            return False
+        input_vector = scorer.transform()
+        positive_vectors = [scorer.transform(item) for item in positive_examples]
+        negative_vectors = [scorer.transform(item) for item in negative_examples]
+        positive_sims = [cosine_similarity(input_vector, item)[0][0] for item in positive_vectors]
+        negative_sims = [cosine_similarity(input_vector, item)[0][0] for item in negative_vectors]
+        max_pos_sim = max(positive_sims)
+        max_neg_sim = 0 if len(negative_sims) == 0 else max(negative_sims)
+        return max_pos_sim > threshold > max_neg_sim
+
+    return has_match_inner

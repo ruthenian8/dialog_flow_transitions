@@ -3,7 +3,7 @@ import pytest
 from df_engine.core import Context
 from df_transitions.utils import INTENT_KEY
 from df_transitions.types import Label
-from df_transitions.conditions import has_cls_label
+from df_transitions.conditions import has_cls_label, has_match
 
 
 @pytest.mark.parametrize(
@@ -22,6 +22,11 @@ def test_conditions(input, testing_actor):
 
 @pytest.mark.parametrize(["input"], [(1,), (3.3,), ({"a", "b"},)])
 def test_conds_invalid(input, testing_actor):
-    ctx = Context()
     with pytest.raises(NotImplementedError):
-        result = has_cls_label(input)(ctx, testing_actor)
+        result = has_cls_label(input)(Context(), testing_actor)
+
+
+@pytest.mark.parametrize(["_input"], [({},), ({},)])
+def test_has_match(_input, testing_actor, testing_scorer):
+    result = has_match(testing_scorer, **_input)(Context(), testing_actor)
+    assert True

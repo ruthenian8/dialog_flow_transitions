@@ -27,6 +27,22 @@ pip install df_transitions
 
 ```
 
+```python
+gdf_scorer = DialogFlowScorer(
+    namespace_key="gdf",
+    label_collection=common_label_collection,
+    service_account_json="service-account-credentials.json",
+    sync_data=False,
+)
+
+rasa_scorer = RasaScorer(
+    namespace_key="rasa",
+    label_collection=common_label_collection,
+    url="https://my-rasa-server/",
+    api_key="my-api-token",
+)
+```
+
 To get more advanced examples, take a look at [examples](examples) on GitHub.
 
 # Contributing to the Dialog Flow Transitions

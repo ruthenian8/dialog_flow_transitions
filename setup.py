@@ -65,5 +65,5 @@ setup(
     install_requires=requirements,
     test_suite="tests",
     tests_require=test_requirements,
-    extras_require={"hf": ["transformers", "torch"], "gensim": ["gensim"]}
+    extras_require={"hf": ["transformers>=4.16.2", "torch>=1.7.0"], "gensim": ["gensim>=4.0.0"]}
 )

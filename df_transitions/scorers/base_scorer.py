@@ -5,7 +5,6 @@ Base Provider
 This module implements an abstract base class for intent providers.
 """
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from df_engine.core import Context, Actor
 
@@ -14,12 +13,26 @@ from ..utils import INTENT_KEY
 
 
 class BaseScorer(ABC):
-    def __init__(self, namespace_key: str = "default", label_collection: Optional[LabelCollection] = None) -> None:
+    def __init__(self, namespace_key: str = "default") -> None:
         self.namespace_key = namespace_key
-        self.label_collection = label_collection
 
     @abstractmethod
     def predict(self, request: str) -> dict:
+        """
+        Predict the probability of one or several classes.
+        """
+        raise NotImplementedError
+
+    def transform(self, request: str):
+        """
+        Get a representation of the input data.
+        """
+        raise NotImplementedError
+
+    def fit(self, label_collection: LabelCollection) -> None:
+        """
+        Reinitialize the inner model with the given data.
+        """
         raise NotImplementedError
 
     def __call__(self, ctx: Context, actor: Actor):
@@ -39,8 +52,15 @@ class BaseScorer(ABC):
 
         return ctx
 
+    def save(self, path: str, **kwargs) -> None:
+        """
+        Save the model to a specified location.
+        """
+        raise NotImplementedError
 
-class BaseCosineScorer(BaseScorer):
-    @abstractmethod
-    def fit(self, request: str):
+    @classmethod
+    def load(cls, path: str, namespace_key: str) -> __qualname__:
+        """
+        Load a model from the specified location and instantiate the scorer.
+        """
         raise NotImplementedError

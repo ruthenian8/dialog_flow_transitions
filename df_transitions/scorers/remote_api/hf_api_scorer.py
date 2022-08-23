@@ -5,31 +5,39 @@ from urllib.parse import urljoin
 
 import requests
 
-from ...types import LabelCollection
 from ...utils import STATUS_SUCCESS, STATUS_UNAVAILABLE
 from ..base_scorer import BaseScorer
 
 
 class HFApiScorer(BaseScorer):
+    """
+    Parameters
+    -----------
+    namespace_key:
+        Name of the namespace the model will be using in framework states.
+    model: str
+    api_key: str
+    retries: int
+    headers: Optional[dict]
+    """
+
     def __init__(
         self,
-        namespace_key: str,
-        label_collection: Optional[LabelCollection],
+        model: str,
         api_key: str,
-        model: Optional[str] = None,
-        url: Optional[str] = None,
-        headers: Optional[dict] = None,
+        namespace_key: Optional[str] = None,
+        *,
         retries: int = 60,
+        headers: Optional[dict] = None,
     ) -> None:
-        super().__init__(namespace_key=namespace_key, label_collection=label_collection)
-        assert model or url, "setting model or url is required"
+        super().__init__(namespace_key=namespace_key)
         self.api_key = api_key
         self.model = model
         self.headers = (
             headers if headers else {"Authorization": "Bearer " + api_key, "Content-Type": "application/json"}
         )
         self.retries = retries
-        self.url = url if url else urljoin("https://api-inference.huggingface.co/models/", model)
+        self.url = urljoin("https://api-inference.huggingface.co/models/", model)
 
     def predict(self, request: str) -> dict:
         retries = 0
