@@ -12,6 +12,8 @@ from ...huggingface import BaseHFScorer
 class HFClassifier(BaseHFScorer):
     def predict(self, request: str) -> dict:
         model_output = self.call_model(request)
-        logits_list: List[float] = model_output.tolist()[0]
-        result = {categorical_code: score for categorical_code, score in enumerate(logits_list)}
+        logits_list = model_output.logits
+        predicted_class_id = logits_list.argmax().item()
+        label = self.model.config.id2label[predicted_class_id]
+        result = {label: 1}
         return result

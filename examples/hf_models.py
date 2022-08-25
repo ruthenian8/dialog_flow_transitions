@@ -15,8 +15,10 @@ from examples import example_utils
 
 logger = logging.getLogger(__name__)
 
-tokenizer = AutoTokenizer("bert-base-uncased")
-model = AutoModelForSequenceClassification("my-classification-model")
+# We are using this open source model by Obsei-AI
+# to demonstrate, how custom classifiers can be easily adapted for use in df_transitions
+tokenizer = AutoTokenizer.from_pretrained("obsei-ai/sell-buy-intent-classifier-bert-mini")
+model = AutoModelForSequenceClassification.from_pretrained("obsei-ai/sell-buy-intent-classifier-bert-mini")
 
 common_label_collection = LabelCollection.parse_yaml("./data/example.yaml")
 
