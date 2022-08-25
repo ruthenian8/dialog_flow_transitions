@@ -23,6 +23,7 @@ class CosineScorerMixin:
     label_collection: LabelCollection
         labels and example sentences.
     """
+
     def __init__(self, label_collection: LabelCollection):
         self.label_collection = label_collection
 

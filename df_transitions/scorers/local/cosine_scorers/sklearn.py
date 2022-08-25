@@ -23,8 +23,9 @@ from .cosine_scorer_mixin import CosineScorerMixin
 class SklearnScorer(CosineScorerMixin, BaseSklearnScorer):
     """
     label_collection: LabelCollection
-        Expected labels.    
+        Expected labels.
     """
+
     def __init__(
         self,
         model: Optional[BaseEstimator] = None,

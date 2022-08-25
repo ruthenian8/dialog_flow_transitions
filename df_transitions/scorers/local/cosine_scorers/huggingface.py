@@ -32,8 +32,9 @@ class HFCosineScorer(CosineScorerMixin, BaseHFScorer):
     Parameters
     -----------
     label_collection: LabelCollection
-        Expected labels.    
+        Expected labels.
     """
+
     def __init__(
         self,
         namespace_key: str,

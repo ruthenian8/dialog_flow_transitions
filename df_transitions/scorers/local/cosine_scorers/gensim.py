@@ -43,6 +43,7 @@ class GensimScorer(CosineScorerMixin, BaseScorer):
     kwargs:
         Keyword arguments are forwarded to the model constructor.
     """
+
     def __init__(
         self,
         model: Word2Vec,
