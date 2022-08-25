@@ -4,7 +4,7 @@ from df_engine.core.keywords import RESPONSE, PRE_TRANSITIONS_PROCESSING, GLOBAL
 from df_engine.core import Actor
 from df_engine import conditions as cnd
 
-from df_transitions.scorers.local.classifiers.regex import RegexClassifier
+from df_transitions.scorers.local.classifiers.regex import RegexClassifier, RegexModel
 from df_transitions.types import LabelCollection
 from df_transitions import conditions as i_cnd
 
@@ -13,7 +13,7 @@ from examples import example_utils
 logger = logging.getLogger(__name__)
 
 regex_scorer = RegexClassifier(
-    namespace_key="regex", label_collection=LabelCollection.parse_yaml("examples/data/example.yaml")
+    namespace_key="regex", model=RegexModel(LabelCollection.parse_yaml("examples/data/example.yaml"))
 )
 
 script = {

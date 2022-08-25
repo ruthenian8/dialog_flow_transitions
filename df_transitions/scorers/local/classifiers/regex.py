@@ -7,8 +7,6 @@ This module provides a regex-based label scorer version.
 import re
 from typing import Optional
 
-from pydantic import validate_arguments
-
 from ...base_scorer import BaseScorer
 from ....types import LabelCollection
 
@@ -28,7 +26,6 @@ class RegexModel:
 
 
 class RegexClassifier(BaseScorer):
-    @validate_arguments
     def __init__(
         self,
         namespace_key: str,

@@ -13,6 +13,16 @@ from ..utils import INTENT_KEY
 
 
 class BaseScorer(ABC):
+    """
+    This class implements an abstract base class for label scoring.
+
+    Parameters
+    -----------
+    namespace_key: str
+        Name of the namespace in framework states that the model will be using.
+
+    """
+
     def __init__(self, namespace_key: str = "default") -> None:
         self.namespace_key = namespace_key
 

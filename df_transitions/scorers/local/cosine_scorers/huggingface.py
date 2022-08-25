@@ -2,9 +2,9 @@
 HuggingFace Cosine Scorer
 --------------------------
 
-TODO: Complete
+This module provides an adapter interface for Huggingface models.
+It leverages transformer embeddings to compute distances between utterances.
 """
-from sklearn.metrics.pairwise import cosine_similarity
 from typing import Optional
 from argparse import Namespace
 
@@ -23,11 +23,17 @@ except ImportError as e:
     IMPORT_ERROR_MESSAGE = e.msg
 
 from ....types import LabelCollection
-from ...base_hf_scorer import BaseHFScorer
+from ...huggingface import BaseHFScorer
 from .cosine_scorer_mixin import CosineScorerMixin
 
 
-class HFCosineScorer(BaseHFScorer, CosineScorerMixin):
+class HFCosineScorer(CosineScorerMixin, BaseHFScorer):
+    """
+    Parameters
+    -----------
+    label_collection: LabelCollection
+        Expected labels.    
+    """
     def __init__(
         self,
         namespace_key: str,
@@ -38,5 +44,5 @@ class HFCosineScorer(BaseHFScorer, CosineScorerMixin):
         tokenizer_kwargs: Optional[dict] = None,
         model_kwargs: Optional[dict] = None,
     ) -> None:
-        BaseHFScorer.__init__(self, namespace_key, model, tokenizer, device, tokenizer_kwargs, model_kwargs)
         CosineScorerMixin.__init__(self, label_collection=label_collection)
+        BaseHFScorer.__init__(self, namespace_key, model, tokenizer, device, tokenizer_kwargs, model_kwargs)

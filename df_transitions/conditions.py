@@ -8,7 +8,6 @@ from typing import Callable, Optional, List
 from functools import singledispatch
 
 from sklearn.metrics.pairwise import cosine_similarity
-from pydantic import validate_arguments
 from df_engine.core import Context, Actor
 
 from .types import Label
@@ -61,7 +60,6 @@ def _(label, namespace: Optional[str] = None):
     return has_cls_label_innner
 
 
-@validate_arguments
 def has_match(
     scorer: BaseScorer,
     positive_examples: Optional[List[str]],
@@ -74,7 +72,7 @@ def has_match(
     def has_match_inner(ctx: Context, actor: Actor) -> bool:
         if not isinstance(ctx.last_request, str):
             return False
-        input_vector = scorer.transform()
+        input_vector = scorer.transform(ctx.last_request)
         positive_vectors = [scorer.transform(item) for item in positive_examples]
         negative_vectors = [scorer.transform(item) for item in negative_examples]
         positive_sims = [cosine_similarity(input_vector, item)[0][0] for item in positive_vectors]

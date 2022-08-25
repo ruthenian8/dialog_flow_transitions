@@ -8,16 +8,9 @@ import uuid
 import time
 import json
 from urllib.parse import urljoin
-from typing import List, Optional
-from pydantic import parse_obj_as, Field, validator, root_validator
+from typing import Optional
 
-from yaml import dump
 import requests
-
-try:
-    from yaml import CDumper as Dumper
-except ImportError:
-    from yaml import Dumper
 
 from ...types import RasaResponse
 from ..base_scorer import BaseScorer
@@ -28,13 +21,11 @@ class RasaScorer(BaseScorer):
     """
     RasaScorer
     -----------
-    This class
+    This class implements a connection to RASA nlu server for label scoring.
 
     Parameters
     -----------
 
-    namespace_key: str
-        Name of the namespace the model will be using in framework states.
     model: str
         Rasa model url.
     api_key: Optional[str]
@@ -43,6 +34,8 @@ class RasaScorer(BaseScorer):
     jwt_token: Optional[str]
         Rasa jwt token for request authorization. The exact authentification method can be retrieved
         from your Rasa Server config.
+    namespace_key: Optional[str]
+        Name of the namespace in framework states that the model will be using.
     retries: int
         The number of times requests will be repeated in case of failure.
     headers: Optional[dict]

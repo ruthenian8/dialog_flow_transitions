@@ -14,6 +14,15 @@ from ....types import LabelCollection
 
 
 class CosineScorerMixin:
+    """
+    This class imlements a 'predict' method that returns the likelihood of each label
+    from a pre-defined collection, judging by how close the last request is to the examples.
+
+    Parameters
+    -----------
+    label_collection: LabelCollection
+        labels and example sentences.
+    """
     def __init__(self, label_collection: LabelCollection):
         self.label_collection = label_collection
 

@@ -15,6 +15,7 @@ try:
     from transformers.modeling_utils import PreTrainedModel
     from transformers import AutoModelForSequenceClassification
     import torch
+
     IMPORT_ERROR_MESSAGE = None
 except ImportError as e:
     np = Namespace(ndarray=None)
@@ -28,12 +29,27 @@ from ..types import LabelCollection
 
 
 class BaseHFScorer(BaseScorer):
+    """
+    model: PreTrainedModel
+        An instance of a Huggingface model. We assume that training and finetuning has been done beforehand.
+    tokenizer: Tokenizer
+        A pre-trained Huggingface tokenizer. Must match with the passed model.
+    device: torch.device
+        The device to perform inference on.
+    namespace_key: Optional[str]
+        Name of the namespace in framework states that the model will be using.
+    tokenizer_kwargs: Optional[dict]
+        Arguments to the tokenizer that override the default ones.
+    model_kwargs: Optional[dict]
+        Arguments to the model that override the default ones.
+    """
+
     def __init__(
         self,
-        namespace_key: str,
         model: PreTrainedModel,
         tokenizer: Tokenizer,
         device: torch.device,
+        namespace_key: Optional[str] = None,
         tokenizer_kwargs: Optional[dict] = None,
         model_kwargs: Optional[dict] = None,
     ) -> None:
@@ -65,12 +81,20 @@ class BaseHFScorer(BaseScorer):
         raise NotImplementedError
 
     def save(self, path: str, **kwargs) -> None:
-        dir_path = os.path.dirname(path)
-        self.model.save_pretrainsed(dir_path, **kwargs)
+        """
+        Parameters
+        -----------
+        path: str
+            Path to saving directory.
+        kwargs
+            Keyword arguments are forwarded to the 'save_pretrained' method of the underlying model.
+        """
+        self.model.save_pretrained(path, **kwargs)
+        self.tokenizer.save_pretrained(path)
 
     @classmethod
-    def load(cls, path: str) -> __qualname__:
+    def load(cls, path: str, namespace_key: str) -> __qualname__:
         model = AutoModelForSequenceClassification.from_pretrained(path)
         tokenizer = AutoTokenizer.from_pretrained(path)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        return cls(model=model, tokenizer=tokenizer, device=device)
+        return cls(model=model, tokenizer=tokenizer, device=device, namespace_key=namespace_key)

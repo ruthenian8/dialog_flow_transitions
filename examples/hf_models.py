@@ -20,9 +20,7 @@ model = AutoModelForSequenceClassification("my-classification-model")
 
 common_label_collection = LabelCollection.parse_yaml("./data/example.yaml")
 
-annotator_1 = HFClassifier(
-    namespace_key="hf_classifier", label_collection=common_label_collection, tokenizer=tokenizer, model=model
-)
+annotator_1 = HFClassifier(namespace_key="hf_classifier", tokenizer=tokenizer, model=model)
 
 annotator_2 = HFCosineScorer(
     namespace_key="hf_matcher", label_collection=common_label_collection, tokenizer=tokenizer, model=model

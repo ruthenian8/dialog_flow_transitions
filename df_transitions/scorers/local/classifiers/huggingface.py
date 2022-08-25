@@ -6,7 +6,7 @@ TODO: complete
 """
 from typing import List
 
-from ...base_hf_scorer import BaseHFScorer
+from ...huggingface import BaseHFScorer
 
 
 class HFClassifier(BaseHFScorer):

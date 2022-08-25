@@ -60,27 +60,6 @@ class LabelCollection(BaseModel):
         return value
 
 
-class RasaTrainingIntent(BaseModel):
-    intent: str = Field(alias="name")
-    examples: List[str]
-
-
-class RasaTrainingData(BaseModel):
-    pipeline: List[str] = Field(default_factory=list)
-    policies: List[str] = Field(default_factory=list)
-    intents: List[str] = Field(default_factory=list)
-    entities: List[str] = Field(default_factory=list)
-    slots: Dict[str, Any] = Field(default_factory=dict)
-    actions: List[str] = Field(default_factory=list)
-    forms: Dict[str, Any] = Field(default_factory=dict)
-    e2e_actions: List[str] = Field(default_factory=list)
-    responses: Dict[str, Any] = Field(default_factory=dict)
-    session_config: Dict[str, Any] = Field(default_factory=dict)
-    nlu: List[RasaTrainingIntent]
-    rules: List[Dict[str, Any]]
-    stories: List[Dict[str, Any]]
-
-
 class RasaIntent(BaseModel):
     confidence: float
     name: str

@@ -16,8 +16,9 @@ except ImportError as e:
 from .types import Label, LabelCollection
 
 
-class IntentDataset(Dataset):
+class TrainingDataset(Dataset):
     def __init__(self, tokenizer: Tokenizer, label_collection: LabelCollection) -> None:
+        IMPORT_ERROR_MESSAGE = globals().get("IMPORT_ERROR_MESSAGE")
         if IMPORT_ERROR_MESSAGE is not None:
             raise ImportError(IMPORT_ERROR_MESSAGE)
         super().__init__()

@@ -15,14 +15,16 @@ except ImportError as e:
     IMPORT_ERROR_MESSAGE = e.msg
 
 
-class DialogFlowScorer(BaseScorer):
+class GoogleDialogFlowScorer(BaseScorer):
     """
+    This class implements a connection to Google Dialogflow for label scoring.
+
     Parameters
     -----------
-    namespace_key: str
-        Name of the namespace the model will be using in framework states.
     model: str
         A service account json file that contains a link to your dialogflow project.
+    namespace_key: str
+        Name of the namespace in framework states that the model will be using.
     language: str
         The language of your dialogflow project. Set to English per default.
 
@@ -38,7 +40,7 @@ class DialogFlowScorer(BaseScorer):
         IMPORT_ERROR_MESSAGE = globals().get("IMPORT_ERROR_MESSAGE")
         if IMPORT_ERROR_MESSAGE is not None:
             raise ImportError(IMPORT_ERROR_MESSAGE)
-        super().__init__(namespace_key=namespace_key, model=None)
+        super().__init__(namespace_key=namespace_key)
         self._language = language
 
         assert Path(model).exists(), f"Path {model} does not exist."

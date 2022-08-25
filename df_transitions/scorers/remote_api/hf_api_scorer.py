@@ -13,12 +13,17 @@ class HFApiScorer(BaseScorer):
     """
     Parameters
     -----------
-    namespace_key:
-        Name of the namespace the model will be using in framework states.
     model: str
+        Hosted model name, e. g. 'bert-base-uncased', etc.
     api_key: str
+        Huggingface inference API token.
+    namespace_key: Optional[str]
+        Name of the namespace in framework states that the model will be using.
     retries: int
+        Number of retries in case of request failure.
     headers: Optional[dict]
+        A dictionary that overrides a standard set of headers.
+
     """
 
     def __init__(
@@ -38,6 +43,9 @@ class HFApiScorer(BaseScorer):
         )
         self.retries = retries
         self.url = urljoin("https://api-inference.huggingface.co/models/", model)
+        test_response = requests.get(self.url, headers=self.headers)  # assert that the model exists
+        if not test_response.status_code == STATUS_SUCCESS:
+            raise requests.HTTPError(test_response.text)
 
     def predict(self, request: str) -> dict:
         retries = 0
@@ -53,6 +61,6 @@ class HFApiScorer(BaseScorer):
 
         json_response = response.json()
         result = {}
-        for label_score_pair in json_response[0][0]:
+        for label_score_pair in json_response[0]:
             result.update({label_score_pair["label"]: label_score_pair["score"]})
         return result
