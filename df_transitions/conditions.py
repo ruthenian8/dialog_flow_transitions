@@ -17,6 +17,18 @@ from .models.base_model import BaseModel
 
 @singledispatch
 def has_cls_label(label, namespace: Optional[str] = None):
+    """
+    Use this condition, when you need to check, whether the probability
+    of a particular label for the last user utterance surpasses the threshold.
+
+    Parameters
+    -----------
+    label: Any
+        String name or a reference to a Label object, or a collection thereof.
+    namespace: Optional[str]
+        Namespace key of a particular model that should detect the label.
+        If not set, all namespaces will be searched for the required label.
+    """
     raise NotImplementedError
 
 
@@ -66,6 +78,23 @@ def has_match(
     negative_examples: Optional[List[str]] = None,
     threshold: float = 0.9,
 ):
+    """
+    Use this condition, if you need to check whether the last utterance is close to some
+    pre-defined phrases. N.B.: Note that the model you will use should be already fit by the time
+    you pass it to the function.
+
+    Parameters
+    -----------
+    model: BaseModel
+        df_transitions' model. Use one of the models from the `cosine_scorers` subpackage.
+    positive_examples: Optional[List[str]]
+        A list of phrases that an utterance should be close to.
+    negative_examples: Optional[List[str]] = None
+        A list of phrases that an utterance should be distant from.
+    threshold: float = 0.9
+        The minimal cosine similarity to positive examples that is required
+        for a positive response from the function.
+    """
     if negative_examples is None:
         negative_examples = []
 

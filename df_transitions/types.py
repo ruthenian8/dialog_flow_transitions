@@ -1,3 +1,11 @@
+"""
+Types
+******
+
+This module contains structures that are required to parse labels from files
+and parse requests and responses to and from various APIs.
+
+"""
 from pathlib import Path
 from typing import List, Dict, Optional, Any, Union
 
