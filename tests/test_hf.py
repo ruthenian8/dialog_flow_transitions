@@ -8,8 +8,8 @@ try:
 except ImportError:
     pytest.skip(allow_module_level=True)
 
-from df_transitions.scorers.local.classifiers.huggingface import HFClassifier
-from df_transitions.scorers.local.cosine_scorers.huggingface import HFCosineScorer
+from df_transitions.models.local.classifiers.huggingface import HFClassifier
+from df_transitions.models.local.cosine_scorers.huggingface import HFScorer
 
 
 @pytest.fixture(scope="session")
@@ -30,19 +30,19 @@ def testing_classifier(testing_model, testing_tokenizer):
 
 
 @pytest.fixture(scope="session")
-def testing_scorer(testing_model, testing_tokenizer):
-    yield HFCosineScorer(
-        model=testing_model, tokenizer=testing_tokenizer, device=torch.device("cpu"), namespace_key="HFscorer"
+def testing_model(testing_model, testing_tokenizer):
+    yield HFScorer(
+        model=testing_model, tokenizer=testing_tokenizer, device=torch.device("cpu"), namespace_key="HFmodel"
     )
 
 
-def test_saving(save_file: str, testing_classifier: HFClassifier, testing_scorer: HFCosineScorer):
+def test_saving(save_file: str, testing_classifier: HFClassifier, testing_model: HFScorer):
     testing_classifier.save(path=save_file)
     testing_classifier = HFClassifier.load(save_file, namespace_key="HFclassifier")
     assert testing_classifier
-    testing_scorer.save(path=save_file)
-    testing_scorer = HFCosineScorer.load(save_file, namespace_key="HFscorer")
-    assert testing_scorer
+    testing_model.save(path=save_file)
+    testing_model = HFScorer.load(save_file, namespace_key="HFmodel")
+    assert testing_model
 
 
 def test_predict(testing_classifier: HFClassifier):
@@ -51,8 +51,8 @@ def test_predict(testing_classifier: HFClassifier):
     assert isinstance(result, dict)
 
 
-def test_transform(testing_scorer: HFCosineScorer, testing_classifier: HFClassifier):
-    result_1 = testing_scorer.transform()
+def test_transform(testing_model: HFScorer, testing_classifier: HFClassifier):
+    result_1 = testing_model.transform()
     assert isinstance(result_1, np.ndarray)
     result_2 = testing_classifier.transform()
     assert isinstance(result_2, np.ndarray)

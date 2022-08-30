@@ -6,8 +6,8 @@ from df_engine.core.keywords import RESPONSE, PRE_TRANSITIONS_PROCESSING, GLOBAL
 from df_engine.core import Actor
 from df_engine import conditions as cnd
 
-from df_transitions.scorers.local.classifiers.huggingface import HFClassifier
-from df_transitions.scorers.local.cosine_scorers.huggingface import HFCosineScorer
+from df_transitions.models.local.classifiers.huggingface import HFClassifier
+from df_transitions.models.local.cosine_scorers.huggingface import HFScorer
 from df_transitions.types import LabelCollection
 from df_transitions import conditions as i_cnd
 
@@ -22,17 +22,20 @@ model = AutoModelForSequenceClassification.from_pretrained("obsei-ai/sell-buy-in
 
 common_label_collection = LabelCollection.parse_yaml("./data/example.yaml")
 
-annotator_1 = HFClassifier(namespace_key="hf_classifier", tokenizer=tokenizer, model=model)
+model_1 = HFClassifier(namespace_key="hf_classifier", tokenizer=tokenizer, model=model)
 
-annotator_2 = HFCosineScorer(
+model_2 = HFScorer(
     namespace_key="hf_matcher", label_collection=common_label_collection, tokenizer=tokenizer, model=model
 )
 
 
 script = {
     GLOBAL: {
-        PRE_TRANSITIONS_PROCESSING: {"get_intents_1": annotator_1, "get_intents_2": annotator_2},
-        TRANSITIONS: {("food", "offer", 1.2): i_cnd.has_cls_label("food")},
+        PRE_TRANSITIONS_PROCESSING: {"get_intents_1": model_1, "get_intents_2": model_2},
+        TRANSITIONS: {
+            ("service", "buy", 1.2): i_cnd.has_cls_label("LABEL_1"),
+            ("service", "sell", 1.2): i_cnd.has_cls_label("LABEL_0"),
+        },
     },
     "root": {
         LOCAL: {TRANSITIONS: {("service", "offer", 1.2): cnd.true()}},
@@ -40,19 +43,12 @@ script = {
         "fallback": {RESPONSE: "I can't quite get what you mean."},
         "finish": {RESPONSE: "Ok, see you soon!", TRANSITIONS: {("root", "start", 1.3): cnd.true()}},
     },
-    "service": {"offer": {RESPONSE: "What would you like me to look up?"}},
-    "food": {
-        "offer": {
-            RESPONSE: "Would you like me to look up a restaurant for you?",
-            TRANSITIONS: {
-                ("food", "no_results", 1.2): cnd.regexp(r"yes|yeah|good|ok|yep"),
-                ("root", "finish", 0.8): cnd.true(),
-            },
+    "service": {
+        "offer": {RESPONSE: "Welcome to the e-marketplace. Tell us, what you would like to buy or sell."},
+        "buy": {
+            RESPONSE: "We are looking up the requested item... Unfortunately, the item is out of stock at the moment."
         },
-        "no_results": {
-            RESPONSE: "Sorry, all the restaurants are closed due to COVID restrictions.",
-            TRANSITIONS: {("root", "finish"): cnd.true()},
-        },
+        "sell": {RESPONSE: "Your advertisement has been registered. We will inform you of any orders automatically."},
     },
 }
 

@@ -3,7 +3,7 @@ import sys
 
 import pytest
 from sklearn.feature_extraction.text import TfidfVectorizer
-from df_transitions.scorers.local.cosine_scorers.sklearn import SklearnScorer
+from df_transitions.models.local.cosine_scorers.sklearn import SklearnScorer
 from df_transitions.types import LabelCollection
 
 sys.path.insert(0, os.path.pardir)
@@ -22,7 +22,7 @@ def testing_collection():
 
 
 @pytest.fixture(scope="session")
-def standard_scorer(testing_collection):
+def standard_model(testing_collection):
     yield SklearnScorer(tokenizer=TfidfVectorizer(stop_words=None), label_collection=testing_collection)
 
 

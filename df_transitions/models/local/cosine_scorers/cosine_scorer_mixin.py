@@ -21,7 +21,7 @@ class CosineScorerMixin:
     Parameters
     -----------
     label_collection: LabelCollection
-        labels and example sentences.
+        Labels for the scorer. The prediction output depends on proximity to examples of different labels.
     """
 
     def __init__(self, label_collection: LabelCollection):

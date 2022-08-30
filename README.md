@@ -28,14 +28,14 @@ pip install df_transitions
 ```
 
 ```python
-gdf_scorer = DialogFlowScorer(
+gdf_model = DialogFlowModel(
     namespace_key="gdf",
     label_collection=common_label_collection,
     service_account_json="service-account-credentials.json",
     sync_data=False,
 )
 
-rasa_scorer = RasaScorer(
+rasa_model = RasaModel(
     namespace_key="rasa",
     label_collection=common_label_collection,
     url="https://my-rasa-server/",

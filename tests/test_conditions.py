@@ -3,7 +3,7 @@ from typing import List
 import pytest
 from pydantic import parse_obj_as
 from df_engine.core import Context
-from df_transitions.utils import INTENT_KEY
+from df_transitions.utils import LABEL_KEY
 from df_transitions.types import Label, LabelCollection
 from df_transitions.conditions import has_cls_label, has_match
 
@@ -18,7 +18,7 @@ from df_transitions.conditions import has_cls_label, has_match
     ],
 )
 def test_conditions(input, testing_actor):
-    ctx = Context(framework_states={INTENT_KEY: {"scorer_a": {"a": 1, "b": 1}, "scorer_b": {"b": 1, "c": 1}}})
+    ctx = Context(framework_states={LABEL_KEY: {"model_a": {"a": 1, "b": 1}, "model_b": {"b": 1, "c": 1}}})
     assert has_cls_label(input)(ctx, testing_actor) == True
 
 
@@ -42,7 +42,7 @@ def test_conds_invalid(input, testing_actor):
         ),
     ],
 )
-def test_has_match(_input: dict, testing_actor, thresh, standard_scorer, last_request):
+def test_has_match(_input: dict, testing_actor, thresh, standard_model, last_request):
     ctx = Context()
     ctx.add_request(last_request)
     # Per default, we assume that the model has already been fit.
@@ -50,6 +50,6 @@ def test_has_match(_input: dict, testing_actor, thresh, standard_scorer, last_re
     collection = LabelCollection(
         labels=parse_obj_as(List[Label], [{"name": key, "examples": values} for key, values in _input.items()])
     )
-    standard_scorer.fit(collection)
-    result = has_match(standard_scorer, threshold=thresh, **_input)(ctx, testing_actor)
+    standard_model.fit(collection)
+    result = has_match(standard_model, threshold=thresh, **_input)(ctx, testing_actor)
     assert result

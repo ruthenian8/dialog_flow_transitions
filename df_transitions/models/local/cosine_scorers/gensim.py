@@ -1,5 +1,5 @@
 """
-Gensim Cosine Scorer
+Gensim Cosine Model
 --------------------------
 
 This module provides an adapter interface for Gensim models.
@@ -20,22 +20,23 @@ except ImportError as e:
     IMPORT_ERROR_MESSAGE = e.msg
     ALL_MODELS = []
 
-from ...base_scorer import BaseScorer
+from ...base_model import BaseModel
 from ....types import LabelCollection
 from ....utils import DefaultTokenizer
 from .cosine_scorer_mixin import CosineScorerMixin
 
 
-class GensimScorer(CosineScorerMixin, BaseScorer):
+class GensimScorer(CosineScorerMixin, BaseModel):
     """
-    This class adapts gensim vector models to the DFF scorer interface
+    GensimScorer utilizes embeddings from Gensim models to measure
+    proximity between utterances and pre-defined labels.
 
     Parameters
     -----------
     model: gensim.models.word2vec.Word2Vec
         Gensim vector model (Word2Vec, FastText, etc.)
     label_collection: LabelCollection
-        Expected labels.
+        Labels for the scorer. The prediction output depends on proximity to different labels.
     tokenizer: Optional[Callable[[str], List[str]]]
         Class or function that performs string tokenization.
     namespace_key: Optional[str]
@@ -56,7 +57,7 @@ class GensimScorer(CosineScorerMixin, BaseScorer):
         if IMPORT_ERROR_MESSAGE is not None:
             raise ImportError(IMPORT_ERROR_MESSAGE)
         CosineScorerMixin.__init__(self, label_collection=label_collection)
-        BaseScorer.__init__(self, namespace_key=namespace_key)
+        BaseModel.__init__(self, namespace_key=namespace_key)
         self.model = model
         self.tokenizer = tokenizer or DefaultTokenizer()
         # self.fit(self.label_collection, **kwargs)

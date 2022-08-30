@@ -2,7 +2,7 @@ from typing import Optional
 import uuid
 from pathlib import Path
 
-from ..base_scorer import BaseScorer
+from ..base_model import BaseModel
 
 try:
     from google.cloud import dialogflow_v2
@@ -15,7 +15,7 @@ except ImportError as e:
     IMPORT_ERROR_MESSAGE = e.msg
 
 
-class GoogleDialogFlowScorer(BaseScorer):
+class GoogleDialogFlowModel(BaseModel):
     """
     This class implements a connection to Google Dialogflow for label scoring.
 

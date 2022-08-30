@@ -3,7 +3,7 @@ import re
 STATUS_UNAVAILABLE = 503
 STATUS_SUCCESS = 200
 
-INTENT_KEY = "intents"
+LABEL_KEY = "labels"
 
 
 class DefaultTokenizer:

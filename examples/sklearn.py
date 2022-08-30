@@ -6,8 +6,8 @@ from df_engine import conditions as cnd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 
-from df_transitions.scorers.local.classifiers.sklearn import SklearnClassifier
-from df_transitions.scorers.local.cosine_scorers.sklearn import SklearnScorer
+from df_transitions.models.local.classifiers.sklearn import SklearnClassifier
+from df_transitions.models.local.cosine_scorers.sklearn import SklearnScorer
 from df_transitions.types import LabelCollection
 from df_transitions import conditions as i_cnd
 
@@ -17,16 +17,16 @@ logger = logging.getLogger(__name__)
 
 classifier = SklearnClassifier(tokenizer=TfidfVectorizer(), model=LogisticRegression())
 classifier.fit(LabelCollection.parse_yaml("examples/data/labesl.yaml"))
-Scorer = SklearnScorer(tokenizer=TfidfVectorizer())
-Scorer.fit(LabelCollection.parse_yaml("examples/data/labesl.yaml"))
+scorer = SklearnScorer(tokenizer=TfidfVectorizer())
+scorer.fit(LabelCollection.parse_yaml("examples/data/labesl.yaml"))
 
 
 script = {
     GLOBAL: {
-        # PRE_TRANSITIONS_PROCESSING: {"get_intents": regex_scorer},
+        PRE_TRANSITIONS_PROCESSING: {"get_labels_1": classifier, "get_labels_2": scorer},
         TRANSITIONS: {
             ("food", "offer", 1.2): i_cnd.has_cls_label("food"),
-            ("food", "offer", 1.2): i_cnd.has_match(Scorer, ["I want to eat"]),
+            ("food", "offer", 1.2): i_cnd.has_match(scorer, ["I want to eat"]),
         },
     },
     "root": {

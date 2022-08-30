@@ -4,7 +4,7 @@ from df_engine.core.keywords import RESPONSE, PRE_TRANSITIONS_PROCESSING, GLOBAL
 from df_engine.core import Actor
 from df_engine import conditions as cnd
 
-from df_transitions.scorers.remote_api.hf_api_scorer import HFApiScorer
+from df_transitions.models.remote_api.hf_api_model import HFApiModel
 from df_transitions.types import LabelCollection
 from df_transitions import conditions as i_cnd
 
@@ -14,11 +14,11 @@ logger = logging.getLogger(__name__)
 
 common_label_collection = LabelCollection.parse_yaml("./data/example.yaml")
 
-api_scorer = HFApiScorer(model="bert-base-uncased", api_key="my-api-key", namespace_key="hf_api")
+api_model = HFApiModel(model="bert-base-uncased", api_key="my-api-key", namespace_key="hf_api")
 
 script = {
     GLOBAL: {
-        PRE_TRANSITIONS_PROCESSING: {"get_intents_1": api_scorer},
+        PRE_TRANSITIONS_PROCESSING: {"get_intents_1": api_model},
         TRANSITIONS: {("food", "offer", 1.2): i_cnd.has_cls_label("food")},
     },
     "root": {

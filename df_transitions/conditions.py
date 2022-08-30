@@ -11,8 +11,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 from df_engine.core import Context, Actor
 
 from .types import Label
-from .utils import INTENT_KEY
-from .scorers.base_scorer import BaseScorer
+from .utils import LABEL_KEY
+from .models.base_model import BaseModel
 
 
 @singledispatch
@@ -23,11 +23,11 @@ def has_cls_label(label, namespace: Optional[str] = None):
 @has_cls_label.register(str)
 def _(label, namespace: Optional[str] = None):
     def has_cls_label_innner(ctx: Context, actor: Actor) -> bool:
-        if INTENT_KEY not in ctx.framework_states:
+        if LABEL_KEY not in ctx.framework_states:
             return False
         if namespace is not None:
-            return ctx.framework_states[INTENT_KEY].get(namespace, {}).get(label, 0) >= 1.0
-        scores = [item.get(label, 0) for item in ctx.framework_states[INTENT_KEY].values()]
+            return ctx.framework_states[LABEL_KEY].get(namespace, {}).get(label, 0) >= 1.0
+        scores = [item.get(label, 0) for item in ctx.framework_states[LABEL_KEY].values()]
         comparison_array = [item >= 1.0 for item in scores]
         return any(comparison_array)
 
@@ -37,11 +37,11 @@ def _(label, namespace: Optional[str] = None):
 @has_cls_label.register(Label)
 def _(label, namespace: Optional[str] = None) -> Callable[[Context, Actor], bool]:
     def has_cls_label_innner(ctx: Context, actor: Actor) -> bool:
-        if INTENT_KEY not in ctx.framework_states:
+        if LABEL_KEY not in ctx.framework_states:
             return False
         if namespace is not None:
-            return ctx.framework_states[INTENT_KEY].get(namespace, {}).get(label.name, 0) >= 1.0
-        scores = [item.get(label.name, 0) for item in ctx.framework_states[INTENT_KEY].values()]
+            return ctx.framework_states[LABEL_KEY].get(namespace, {}).get(label.name, 0) >= 1.0
+        scores = [item.get(label.name, 0) for item in ctx.framework_states[LABEL_KEY].values()]
         comparison_array = [item >= 1.0 for item in scores]
         return any(comparison_array)
 
@@ -61,7 +61,7 @@ def _(label, namespace: Optional[str] = None):
 
 
 def has_match(
-    scorer: BaseScorer,
+    model: BaseModel,
     positive_examples: Optional[List[str]],
     negative_examples: Optional[List[str]] = None,
     threshold: float = 0.9,
@@ -72,9 +72,9 @@ def has_match(
     def has_match_inner(ctx: Context, actor: Actor) -> bool:
         if not isinstance(ctx.last_request, str):
             return False
-        input_vector = scorer.transform(ctx.last_request)
-        positive_vectors = [scorer.transform(item) for item in positive_examples]
-        negative_vectors = [scorer.transform(item) for item in negative_examples]
+        input_vector = model.transform(ctx.last_request)
+        positive_vectors = [model.transform(item) for item in positive_examples]
+        negative_vectors = [model.transform(item) for item in negative_examples]
         positive_sims = [cosine_similarity(input_vector, item)[0][0] for item in positive_vectors]
         negative_sims = [cosine_similarity(input_vector, item)[0][0] for item in negative_vectors]
         max_pos_sim = max(positive_sims)

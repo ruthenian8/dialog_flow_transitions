@@ -13,13 +13,13 @@ from typing import Optional
 import requests
 
 from ...types import RasaResponse
-from ..base_scorer import BaseScorer
+from ..base_model import BaseModel
 from ...utils import STATUS_SUCCESS, STATUS_UNAVAILABLE
 
 
-class RasaScorer(BaseScorer):
+class RasaModel(BaseModel):
     """
-    RasaScorer
+    RasaModel
     -----------
     This class implements a connection to RASA nlu server for label scoring.
 

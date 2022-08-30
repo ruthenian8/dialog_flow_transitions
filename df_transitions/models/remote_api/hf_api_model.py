@@ -6,10 +6,10 @@ from urllib.parse import urljoin
 import requests
 
 from ...utils import STATUS_SUCCESS, STATUS_UNAVAILABLE
-from ..base_scorer import BaseScorer
+from ..base_model import BaseModel
 
 
-class HFApiScorer(BaseScorer):
+class HFApiModel(BaseModel):
     """
     Parameters
     -----------

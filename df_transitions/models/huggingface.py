@@ -24,24 +24,28 @@ except ImportError as e:
     PreTrainedModel = None
     IMPORT_ERROR_MESSAGE = e.msg
 
-from .base_scorer import BaseScorer
+from .base_model import BaseModel
 from ..types import LabelCollection
 
 
-class BaseHFScorer(BaseScorer):
+class BaseHFModel(BaseModel):
     """
+    Base class for Hugging Face-based models.
+
+    Parameters
+    -----------
     model: PreTrainedModel
-        An instance of a Huggingface model. We assume that training and finetuning has been done beforehand.
+        A pretrained Hugging Face format model.
     tokenizer: Tokenizer
-        A pre-trained Huggingface tokenizer. Must match with the passed model.
+        A pretrained Hugging Face tokenizer.
     device: torch.device
-        The device to perform inference on.
-    namespace_key: Optional[str]
+        Pytorch device object. The device will be used for inference and pre-training.
+    namespace_key: str
         Name of the namespace in framework states that the model will be using.
-    tokenizer_kwargs: Optional[dict]
-        Arguments to the tokenizer that override the default ones.
-    model_kwargs: Optional[dict]
-        Arguments to the model that override the default ones.
+    tokenizer_kwargs: Optional[dict] = None
+        Default tokenizer arguments override.
+    model_kwargs: Optional[dict] = None
+        Default model arguments override.
     """
 
     def __init__(

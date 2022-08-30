@@ -47,13 +47,13 @@ class LabelCollection(BaseModel):
         return cls(labels=labels)
 
     @validator("labels")
-    def validate_intents(cls, value: Dict[str, Label]):
+    def validate_labels(cls, value: Dict[str, Label]):
         for idx, key in enumerate(value.keys()):
             value[key]._categorical_code = idx
         return value
 
     @validator("labels", pre=True)
-    def pre_validate_intents(cls, value: Union[Dict[str, Label], List[Label]]):
+    def pre_validate_labels(cls, value: Union[Dict[str, Label], List[Label]]):
         if isinstance(value, list):  # if labels were passed as a list, cast them to a dict
             intent_names = [intent.name for intent in value]
             return {name: intent for name, intent in zip(intent_names, value)}

@@ -9,12 +9,12 @@ from abc import ABC, abstractmethod
 from df_engine.core import Context, Actor
 
 from ..types import LabelCollection
-from ..utils import INTENT_KEY
+from ..utils import LABEL_KEY
 
 
-class BaseScorer(ABC):
+class BaseModel(ABC):
     """
-    This class implements an abstract base class for label scoring.
+    Base class for label-scoring models.
 
     Parameters
     -----------
@@ -53,12 +53,12 @@ class BaseScorer(ABC):
         """
         labels: dict = self.predict(ctx.last_request) if ctx.last_request else dict()
 
-        if INTENT_KEY not in ctx.framework_states:
-            ctx.framework_states[INTENT_KEY] = dict()
+        if LABEL_KEY not in ctx.framework_states:
+            ctx.framework_states[LABEL_KEY] = dict()
 
         namespace = self.namespace_key
 
-        ctx.framework_states[INTENT_KEY][namespace] = labels
+        ctx.framework_states[LABEL_KEY][namespace] = labels
 
         return ctx
 
@@ -71,6 +71,6 @@ class BaseScorer(ABC):
     @classmethod
     def load(cls, path: str, namespace_key: str) -> __qualname__:
         """
-        Load a model from the specified location and instantiate the scorer.
+        Load a model from the specified location and instantiate the model.
         """
         raise NotImplementedError

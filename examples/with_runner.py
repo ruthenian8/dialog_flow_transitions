@@ -1,12 +1,12 @@
 from df_runner import ScriptRunner
 
-from examples.regexp import regex_scorer, script
+from examples.regexp import regex_model, script
 
 runner = ScriptRunner(
     script,
     start_label=("root", "start"),
     fallback_label=("root", "fallback"),
-    pre_annotators=[regex_scorer],
+    pre_annotators=[regex_model],
     post_annotators=[],
 )
 
