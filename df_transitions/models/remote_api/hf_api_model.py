@@ -9,7 +9,7 @@ from ...utils import STATUS_SUCCESS, STATUS_UNAVAILABLE
 from ..base_model import BaseModel
 
 
-class HFApiModel(BaseModel):
+class HFApiModel(BaseModel): # TODO: use upper case for API 
     """
     Parameters
     -----------

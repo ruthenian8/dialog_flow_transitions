@@ -10,7 +10,7 @@ sys.path.insert(0, os.pardir)
 from examples.example_utils import run_test
 
 # pytest.skip(allow_module_level=True)
-
+# TODO: all examples have to pass tests
 
 @pytest.mark.parametrize(
     ["module_name"],

@@ -12,6 +12,7 @@ from examples import example_utils
 
 logger = logging.getLogger(__name__)
 
+# TODO: add examples with raw python objects for regexp classifier
 regex_model = RegexClassifier(
     namespace_key="regex", model=RegexModel(LabelCollection.parse_yaml("examples/data/example.yaml"))
 )

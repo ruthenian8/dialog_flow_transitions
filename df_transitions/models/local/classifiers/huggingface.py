@@ -34,5 +34,5 @@ class HFClassifier(BaseHFModel):
         logits_list = model_output.logits
         predicted_class_id = logits_list.argmax().item()
         label = self.model.config.id2label[predicted_class_id]
-        result = {label: 1}
+        result = {label: 1} # TODO: probs ?
         return result

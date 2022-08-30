@@ -79,3 +79,6 @@ class RasaModel(BaseModel):
         parsed = RasaResponse.parse_obj(json_response)
         result = {item.name: item.confidence for item in parsed.intent_ranking} if parsed.intent_ranking else dict()
         return result
+
+# TODO: test rasa api
+# TODO: `scorer` rename to `matcher`

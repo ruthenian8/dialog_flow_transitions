@@ -19,6 +19,7 @@ from .models.base_model import BaseModel
 def has_cls_label(label, namespace: Optional[str] = None):
     raise NotImplementedError
 
+# TODO: add treshholds
 
 @has_cls_label.register(str)
 def _(label, namespace: Optional[str] = None):
