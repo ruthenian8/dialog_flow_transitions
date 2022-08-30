@@ -1,3 +1,9 @@
+"""
+Utils
+******
+
+This module contains helpful constants and magic variables.
+"""
 import re
 
 STATUS_UNAVAILABLE = 503
