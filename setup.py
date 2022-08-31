@@ -69,6 +69,14 @@ setup(
         "hf": ["transformers>=4.16.2", "torch>=1.7.0", "scikit-learn<=1.1.1"],
         "gensim": ["gensim>=4.0.0", "scikit-learn<=1.1.1"],
         "sklearn": ["scikit-learn<=1.1.1"],
-        "dialogflow": ["google-cloud-dialogflow==2.15.0"]
+        "dialogflow": ["google-cloud-dialogflow==2.15.0"],
+        "all": [
+            "transformers>=4.16.2",
+            "torch>=1.7.0",
+            "scikit-learn<=1.1.1",
+            "gensim>=4.0.0",
+            "scikit-learn<=1.1.1", 
+            "google-cloud-dialogflow==2.15.0"
+        ]
     }
 )

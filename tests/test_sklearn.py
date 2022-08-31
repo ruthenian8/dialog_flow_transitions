@@ -12,8 +12,6 @@ from df_transitions.models.local.classifiers.sklearn import SklearnClassifier
 from df_transitions.models.local.cosine_matchers.sklearn import SklearnMatcher
 from df_transitions.types import LabelCollection
 
-pytest.skip(allow_module_level=True)
-
 
 @pytest.fixture(scope="session")
 def testing_classifier():

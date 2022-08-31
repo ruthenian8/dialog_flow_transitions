@@ -29,7 +29,7 @@ jobs:
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
               python -m pip install --upgrade pip
-              pip install -e .
+              pip install -e .[all]
               pip install -r requirements_test.txt
           else
               make venv
