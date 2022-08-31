@@ -11,7 +11,7 @@ from df_transitions.models.remote_api.google_dialogflow_model import GoogleDialo
 
 @pytest.fixture(scope="session")
 def testing_model(gdf_json):
-    yield GoogleDialogFlowModel(model=gdf_json, namespace_key="dialogflow")
+    yield GoogleDialogFlowModel.from_file(filename=gdf_json, namespace_key="dialogflow")
 
 
 def test_predict(testing_model: GoogleDialogFlowModel):

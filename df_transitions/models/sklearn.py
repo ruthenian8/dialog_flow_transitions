@@ -58,9 +58,7 @@ class BaseSklearnModel(BaseModel):
     def fit(self, label_collection: LabelCollection):
         sentences = [sentence for label in label_collection.labels.values() for sentence in label.examples]
         pred_labels = [
-            number
-            for label in label_collection.labels.values()
-            for number in [label._categorical_code] * len(label.examples)
+            name for label in label_collection.labels.values() for name in [label.name] * len(label.examples)
         ]
         self._pipeline.fit(sentences, pred_labels)
 

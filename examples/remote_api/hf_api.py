@@ -1,14 +1,11 @@
+import os
 import logging
-
-from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 from df_engine.core.keywords import RESPONSE, PRE_TRANSITIONS_PROCESSING, GLOBAL, TRANSITIONS, LOCAL
 from df_engine.core import Actor
 from df_engine import conditions as cnd
 
-from df_transitions.models.local.classifiers.huggingface import HFClassifier
-from df_transitions.models.local.cosine_matchers.huggingface import HFMatcher
-from df_transitions.types import LabelCollection
+from df_transitions.models.remote_api.hf_api_model import HFApiModel
 from df_transitions import conditions as i_cnd
 
 from examples import example_utils
@@ -17,21 +14,15 @@ logger = logging.getLogger(__name__)
 
 # We are using this open source model by Obsei-AI
 # to demonstrate, how custom classifiers can be easily adapted for use in df_transitions
-tokenizer = AutoTokenizer.from_pretrained("obsei-ai/sell-buy-intent-classifier-bert-mini")
-model = AutoModelForSequenceClassification.from_pretrained("obsei-ai/sell-buy-intent-classifier-bert-mini")
-
-common_label_collection = LabelCollection.parse_yaml("examples/data/example.yaml")
-
-model_1 = HFClassifier(namespace_key="hf_classifier", tokenizer=tokenizer, model=model)
-
-model_2 = HFMatcher(
-    namespace_key="hf_matcher", label_collection=common_label_collection, tokenizer=tokenizer, model=model
+api_model = HFApiModel(
+    model="obsei-ai/sell-buy-intent-classifier-bert-mini",
+    api_key=os.getenv("HF_API_KEY"),
+    namespace_key="hf_api",
 )
-
 
 script = {
     GLOBAL: {
-        PRE_TRANSITIONS_PROCESSING: {"get_intents_1": model_1, "get_intents_2": model_2},
+        PRE_TRANSITIONS_PROCESSING: {"get_intents_1": api_model},
         TRANSITIONS: {
             ("service", "buy", 1.2): i_cnd.has_cls_label("LABEL_1", threshold=0.95),
             ("service", "sell", 1.2): i_cnd.has_cls_label("LABEL_0", threshold=0.95),

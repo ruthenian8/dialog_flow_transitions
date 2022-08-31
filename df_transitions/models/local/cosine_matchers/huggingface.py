@@ -24,12 +24,12 @@ except ImportError as e:
 
 from ....types import LabelCollection
 from ...huggingface import BaseHFModel
-from .cosine_scorer_mixin import CosineScorerMixin
+from .cosine_matcher_mixin import CosineMatcherMixin
 
 
-class HFScorer(CosineScorerMixin, BaseHFModel):
+class HFMatcher(CosineMatcherMixin, BaseHFModel):
     """
-    HFScorer utilizes embeddings from Hugging Face models to measure
+    HFMatcher utilizes embeddings from Hugging Face models to measure
     proximity between utterances and pre-defined labels.
 
     Parameters
@@ -43,7 +43,7 @@ class HFScorer(CosineScorerMixin, BaseHFModel):
     namespace_key: str
         Name of the namespace in framework states that the model will be using.
     label_collection: LabelCollection
-        Labels for the scorer. The prediction output depends on proximity to different labels.
+        Labels for the matcher. The prediction output depends on proximity to different labels.
     tokenizer_kwargs: Optional[dict] = None
         Default tokenizer arguments override.
     model_kwargs: Optional[dict] = None
@@ -60,5 +60,5 @@ class HFScorer(CosineScorerMixin, BaseHFModel):
         tokenizer_kwargs: Optional[dict] = None,
         model_kwargs: Optional[dict] = None,
     ) -> None:
-        CosineScorerMixin.__init__(self, label_collection=label_collection)
+        CosineMatcherMixin.__init__(self, label_collection=label_collection)
         BaseHFModel.__init__(self, namespace_key, model, tokenizer, device, tokenizer_kwargs, model_kwargs)

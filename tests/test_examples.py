@@ -12,9 +12,16 @@ from examples.example_utils import run_test
 # pytest.skip(allow_module_level=True)
 # TODO: all examples have to pass tests
 
+
 @pytest.mark.parametrize(
     ["module_name"],
-    [("examples.regexp",)],
+    [
+        ("examples.regexp",),
+        ("examples.remote_api.rasa",),
+        ("examples.remote_api.dialogflow",),
+        ("examples.remote_api.hf_api",),
+        ("examples.sklearn_",),
+    ],
 )
 def test_examples(module_name):
     module = importlib.import_module(module_name)

@@ -23,12 +23,12 @@ except ImportError as e:
 from ...base_model import BaseModel
 from ....types import LabelCollection
 from ....utils import DefaultTokenizer
-from .cosine_scorer_mixin import CosineScorerMixin
+from .cosine_matcher_mixin import CosineMatcherMixin
 
 
-class GensimScorer(CosineScorerMixin, BaseModel):
+class GensimMatcher(CosineMatcherMixin, BaseModel):
     """
-    GensimScorer utilizes embeddings from Gensim models to measure
+    GensimMatcher utilizes embeddings from Gensim models to measure
     proximity between utterances and pre-defined labels.
 
     Parameters
@@ -36,7 +36,7 @@ class GensimScorer(CosineScorerMixin, BaseModel):
     model: gensim.models.word2vec.Word2Vec
         Gensim vector model (Word2Vec, FastText, etc.)
     label_collection: LabelCollection
-        Labels for the scorer. The prediction output depends on proximity to different labels.
+        Labels for the matcher. The prediction output depends on proximity to different labels.
     tokenizer: Optional[Callable[[str], List[str]]]
         Class or function that performs string tokenization.
     namespace_key: Optional[str]
@@ -56,7 +56,7 @@ class GensimScorer(CosineScorerMixin, BaseModel):
         IMPORT_ERROR_MESSAGE = globals().get("IMPORT_ERROR_MESSAGE")
         if IMPORT_ERROR_MESSAGE is not None:
             raise ImportError(IMPORT_ERROR_MESSAGE)
-        CosineScorerMixin.__init__(self, label_collection=label_collection)
+        CosineMatcherMixin.__init__(self, label_collection=label_collection)
         BaseModel.__init__(self, namespace_key=namespace_key)
         self.model = model
         self.tokenizer = tokenizer or DefaultTokenizer()

@@ -16,7 +16,7 @@ from .models.base_model import BaseModel
 
 
 @singledispatch
-def has_cls_label(label, namespace: Optional[str] = None):
+def has_cls_label(label, namespace: Optional[str] = None, threshold: float = 0.9):
     """
     Use this condition, when you need to check, whether the probability
     of a particular label for the last user utterance surpasses the threshold.
@@ -28,45 +28,49 @@ def has_cls_label(label, namespace: Optional[str] = None):
     namespace: Optional[str]
         Namespace key of a particular model that should detect the label.
         If not set, all namespaces will be searched for the required label.
+    threshold: float = 0.9
+        The minimal label probability that triggers a positive response
+        from the function.
     """
     raise NotImplementedError
 
-# TODO: add treshholds
 
 @has_cls_label.register(str)
-def _(label, namespace: Optional[str] = None):
+def _(label, namespace: Optional[str] = None, threshold: float = 0.9):
     def has_cls_label_innner(ctx: Context, actor: Actor) -> bool:
         if LABEL_KEY not in ctx.framework_states:
             return False
         if namespace is not None:
-            return ctx.framework_states[LABEL_KEY].get(namespace, {}).get(label, 0) >= 1.0
+            return ctx.framework_states[LABEL_KEY].get(namespace, {}).get(label, 0) >= threshold
         scores = [item.get(label, 0) for item in ctx.framework_states[LABEL_KEY].values()]
-        comparison_array = [item >= 1.0 for item in scores]
+        comparison_array = [item >= threshold for item in scores]
         return any(comparison_array)
 
     return has_cls_label_innner
 
 
 @has_cls_label.register(Label)
-def _(label, namespace: Optional[str] = None) -> Callable[[Context, Actor], bool]:
+def _(label, namespace: Optional[str] = None, threshold: float = 0.9) -> Callable[[Context, Actor], bool]:
     def has_cls_label_innner(ctx: Context, actor: Actor) -> bool:
         if LABEL_KEY not in ctx.framework_states:
             return False
         if namespace is not None:
-            return ctx.framework_states[LABEL_KEY].get(namespace, {}).get(label.name, 0) >= 1.0
+            return ctx.framework_states[LABEL_KEY].get(namespace, {}).get(label.name, 0) >= threshold
         scores = [item.get(label.name, 0) for item in ctx.framework_states[LABEL_KEY].values()]
-        comparison_array = [item >= 1.0 for item in scores]
+        comparison_array = [item >= threshold for item in scores]
         return any(comparison_array)
 
     return has_cls_label_innner
 
 
 @has_cls_label.register(list)
-def _(label, namespace: Optional[str] = None):
+def _(label, namespace: Optional[str] = None, threshold: float = 0.9):
     def has_cls_label_innner(ctx: Context, actor: Actor) -> bool:
-        scores = [has_cls_label(item, namespace)(ctx, actor) for item in label]
+        if LABEL_KEY not in ctx.framework_states:
+            return False
+        scores = [has_cls_label(item, namespace, threshold)(ctx, actor) for item in label]
         for score in scores:
-            if score >= 1.0:
+            if score >= threshold:
                 return True
         return False
 
@@ -87,14 +91,14 @@ def has_match(
     Parameters
     -----------
     model: BaseModel
-        df_transitions' model. Use one of the models from the `cosine_scorers` subpackage.
+        df_transitions' model. Use one of the models from the `cosine_matchers` subpackage.
     positive_examples: Optional[List[str]]
         A list of phrases that an utterance should be close to.
     negative_examples: Optional[List[str]] = None
         A list of phrases that an utterance should be distant from.
     threshold: float = 0.9
-        The minimal cosine similarity to positive examples that is required
-        for a positive response from the function.
+        The minimal cosine similarity to positive examples that triggers
+        a positive response from the function.
     """
     if negative_examples is None:
         negative_examples = []

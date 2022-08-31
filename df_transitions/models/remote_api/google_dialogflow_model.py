@@ -1,5 +1,6 @@
 from typing import Optional
 import uuid
+import json
 from pathlib import Path
 
 from ..base_model import BaseModel
@@ -32,7 +33,7 @@ class GoogleDialogFlowModel(BaseModel):
 
     def __init__(
         self,
-        model: str,
+        model: dict,
         namespace_key: Optional[str] = None,
         *,
         language: str = "en",
@@ -42,9 +43,12 @@ class GoogleDialogFlowModel(BaseModel):
             raise ImportError(IMPORT_ERROR_MESSAGE)
         super().__init__(namespace_key=namespace_key)
         self._language = language
+        if isinstance(model, dict):
+            info = model
+        else:
+            raise ValueError("Please, pass the service account credentials as dict.")
 
-        assert Path(model).exists(), f"Path {model} does not exist."
-        self._credentials = service_account.Credentials.from_service_account_file(model)
+        self._credentials = service_account.Credentials.from_service_account_info(info)
 
     def predict(self, request: str) -> dict:
         session_id = uuid.uuid4()
@@ -57,3 +61,10 @@ class GoogleDialogFlowModel(BaseModel):
         if result.intent is not None:
             return {result.intent.display_name: result.intent_detection_confidence}
         return {}
+
+    @classmethod
+    def from_file(cls, filename: str, namespace_key: str, language: str = "en"):
+        assert Path(filename).exists(), f"Path {filename} does not exist."
+        with open(filename, "r", encoding="utf-8") as file:
+            info = json.load(file)
+        return cls(model=info, namespace_key=namespace_key, language=language)

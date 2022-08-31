@@ -13,7 +13,7 @@ except ImportError as e:
 from ....types import LabelCollection
 
 
-class CosineScorerMixin:
+class CosineMatcherMixin:
     """
     This class imlements a 'predict' method that returns the likelihood of each label
     from a pre-defined collection, judging by how close the last request is to the examples.
@@ -21,7 +21,7 @@ class CosineScorerMixin:
     Parameters
     -----------
     label_collection: LabelCollection
-        Labels for the scorer. The prediction output depends on proximity to examples of different labels.
+        Labels for the matcher. The prediction output depends on proximity to examples of different labels.
     """
 
     def __init__(self, label_collection: LabelCollection):

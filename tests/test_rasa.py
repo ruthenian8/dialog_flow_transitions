@@ -16,6 +16,8 @@ def testing_model(rasa_url, rasa_api_key):
 
 
 def test_predict(testing_model: RasaModel):
-    request = "I would like to x."
+    request = "Hello there"
     result = testing_model.predict(request=request)
     assert isinstance(result, dict)
+    assert len(result) > 0
+    assert result["greet"] > 0.9  # testing on default intents that include 'greet'

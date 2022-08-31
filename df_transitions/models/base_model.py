@@ -1,9 +1,10 @@
 """
-Base Provider
----------------
+Base Model
+***********
 
 This module implements an abstract base class for intent providers.
 """
+from copy import copy
 from abc import ABC, abstractmethod
 
 from df_engine.core import Context, Actor
@@ -25,6 +26,9 @@ class BaseModel(ABC):
 
     def __init__(self, namespace_key: str = "default") -> None:
         self.namespace_key = namespace_key
+
+    def __deepcopy__(self, *args, **kwargs):
+        return copy(self)
 
     @abstractmethod
     def predict(self, request: str) -> dict:

@@ -1,5 +1,5 @@
 """
-Sklearn Cosine Scorer
+Sklearn Cosine Matcher
 --------------------------
 
 This module provides an adapter interface for sklearn models.
@@ -18,12 +18,12 @@ except ImportError as e:
 
 from ...sklearn import BaseSklearnModel
 from ....types import LabelCollection
-from .cosine_scorer_mixin import CosineScorerMixin
+from .cosine_matcher_mixin import CosineMatcherMixin
 
 
-class SklearnScorer(CosineScorerMixin, BaseSklearnModel):
+class SklearnMatcher(CosineMatcherMixin, BaseSklearnModel):
     """
-    SklearnScorer utilizes embeddings from Sklearn models to measure
+    SklearnMatcher utilizes embeddings from Sklearn models to measure
     proximity between utterances and pre-defined labels.
 
     Parameters
@@ -31,7 +31,7 @@ class SklearnScorer(CosineScorerMixin, BaseSklearnModel):
     model: Optional[BaseEstimator]
         Sklearn-type model
     label_collection: LabelCollection
-        Labels for the scorer. The prediction output depends on proximity to different labels.
+        Labels for the matcher. The prediction output depends on proximity to different labels.
     tokenizer: Optional[Union[BaseEstimator, Pipeline]] = None
         An Sklearn-type tokenizer, like TdidfVectorizer or CountVectorizer. Can also be a product
         of several preprocessors, unified with a pipeline.
@@ -46,5 +46,5 @@ class SklearnScorer(CosineScorerMixin, BaseSklearnModel):
         tokenizer: Optional[Union[BaseEstimator, Pipeline]] = None,
         namespace_key: Optional[str] = None,
     ) -> None:
-        CosineScorerMixin.__init__(self, label_collection=label_collection)
+        CosineMatcherMixin.__init__(self, label_collection=label_collection)
         BaseSklearnModel.__init__(self, model=model, tokenizer=tokenizer, namespace_key=namespace_key)

@@ -5,7 +5,7 @@ Regex Model
 This module provides a regex-based label model version.
 """
 import re
-from typing import Optional
+from typing import Optional, Union
 
 from ...base_model import BaseModel
 from ....types import LabelCollection
@@ -18,7 +18,7 @@ class RegexModel:
     Parameters
     -----------
     label_collection: LabelCollection
-        Labels for the scorer. The prediction output depends on proximity to different labels.
+        Labels for the matcher. The prediction output depends on proximity to different labels.
     """
 
     def __init__(self, label_collection: LabelCollection):
@@ -50,13 +50,14 @@ class RegexClassifier(BaseModel):
 
     def __init__(
         self,
-        model: RegexModel,
+        model: Union[RegexModel, LabelCollection],
         namespace_key: str,
         re_kwargs: Optional[dict] = None,
     ) -> None:
         super().__init__(namespace_key=namespace_key)
         self.re_kwargs = re_kwargs or {"flags": re.IGNORECASE}
-        self.model = model
+        # instantiate if Label Collection has been passed
+        self.model = model if isinstance(model, RegexModel) else RegexModel(model)
 
     def fit(self, label_collection: LabelCollection):
         self.model.label_collection = label_collection

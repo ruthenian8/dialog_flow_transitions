@@ -46,7 +46,7 @@ class RasaModel(BaseModel):
     def __init__(
         self,
         model: str,
-        api_key: Optional[str],
+        api_key: Optional[str] = None,
         jwt_token: Optional[str] = None,
         namespace_key: Optional[str] = None,
         *,
@@ -62,8 +62,7 @@ class RasaModel(BaseModel):
         self.retries = retries
 
     def predict(self, request: str) -> dict:
-        message_id = uuid.uuid4()
-        message = {"message_id": message_id, "text": request}
+        message = {"text": request}
         retries = 0
         while retries < self.retries:
             retries += 1
@@ -79,6 +78,3 @@ class RasaModel(BaseModel):
         parsed = RasaResponse.parse_obj(json_response)
         result = {item.name: item.confidence for item in parsed.intent_ranking} if parsed.intent_ranking else dict()
         return result
-
-# TODO: test rasa api
-# TODO: `scorer` rename to `matcher`
