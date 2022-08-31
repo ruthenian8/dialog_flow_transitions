@@ -12,6 +12,11 @@ jobs:
         os: [ubuntu-latest, macOS-latest, windows-latest]
 
     runs-on: ${{ matrix.os }}
+    env:
+      HF_API_KEY: ${{ secrets.HF_API_KEY }}
+      GDF_ACCOUNT_JSON: ${{ secrets.GDF_ACCOUNT_JSON }}
+      RASA_URL: ${{ secrets.RASA_URL }}
+
     steps:
       - uses: actions/checkout@v2
 

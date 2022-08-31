@@ -8,9 +8,7 @@ try:
     import gensim
     import gensim.downloader as api
 except ImportError:
-    pytest.skip(allow_module_leve=True)
-
-pytest.skip(allow_module_level=True)
+    pytest.skip(allow_module_level=True)
 
 
 @pytest.fixture(scope="session")
