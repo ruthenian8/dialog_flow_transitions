@@ -1,8 +1,9 @@
 """
-Base HF Provider
-------------------
+Base HF Model
+***************
 
-Module
+This module provides a base class for matchers and classifiers
+built on top of Hugging Face models.
 """
 import os
 from argparse import Namespace
@@ -11,9 +12,9 @@ from collections.abc import Iterable
 
 try:
     import numpy as np
-    from tokenizers import Tokenizer, AutoTokenizer
+    from tokenizers import Tokenizer
     from transformers.modeling_utils import PreTrainedModel
-    from transformers import AutoModelForSequenceClassification
+    from transformers import AutoModelForSequenceClassification, AutoTokenizer
     import torch
 
     IMPORT_ERROR_MESSAGE = None

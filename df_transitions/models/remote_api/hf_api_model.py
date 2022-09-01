@@ -1,3 +1,10 @@
+"""
+HF API Model
+*************
+
+This module provides the :py:class:`~HFAPIModel` class that allows you
+to use remotely hosted Hugging Face models. 
+"""
 import time
 import json
 from typing import Optional
@@ -9,8 +16,16 @@ from ...utils import STATUS_SUCCESS, STATUS_UNAVAILABLE
 from ..base_model import BaseModel
 
 
-class HFApiModel(BaseModel):  # TODO: use upper case for API
+class HFAPIModel(BaseModel):
     """
+    This class implements a connection to the Hugging Face inference API for label scoring.
+
+    Prerequisites
+    --------------
+    Obtain an API token from Hugging Face to gain full access to hosted models.
+    Note, that the service can fail, if you exceed the usage limits defined by your
+    subscription type.
+
     Parameters
     -----------
     model: str

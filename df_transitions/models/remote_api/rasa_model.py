@@ -23,6 +23,13 @@ class RasaModel(BaseModel):
     -----------
     This class implements a connection to RASA nlu server for label scoring.
 
+    Prerequisites
+    --------------
+    In order to work with this class, you need to have a running instance of Rasa NLU Server
+    with the model trained to recognize your intents.
+    Please, refer to the `RASA docs <https://rasa.com/docs/rasa/nlu-only-server>`_ on how to
+    launch an NLU-only server.
+
     Parameters
     -----------
 

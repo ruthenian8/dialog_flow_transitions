@@ -1,5 +1,9 @@
 """
-TODO: implement
+Sklearn Classifier
+*******************
+
+This module provides an adapter interface for Sklearn models.
+Use Sklearn classifiers to achieve great results on a limited set of data.
 """
 from typing import Optional, Union
 

@@ -1,3 +1,9 @@
+"""
+Google Dialogflow Model
+************************
+
+The module allows you to use Dialogflow as a service to gain insights about user intents.
+"""
 from typing import Optional
 import uuid
 import json
@@ -20,10 +26,20 @@ class GoogleDialogFlowModel(BaseModel):
     """
     This class implements a connection to Google Dialogflow for label scoring.
 
+    Prerequisites
+    --------------
+    Note, that before you use the class, you need to set up a Dialogflow project,
+    create intents, and train a language model, which can be easily done
+    using the Dialogflow web interface.
+    After this is done, you should obtain a service account JSON file from Google
+    and pass it to this class, using `from_file` method.
+
     Parameters
     -----------
-    model: str
-        A service account json file that contains a link to your dialogflow project.
+    model: dict
+        A parsed service account json that contains a link to your dialogflow project.
+        Calling json.load() on the file obtained from Google is sufficient to get the
+        credentials object. Alternatively, :py:meth:`use from_file` method
     namespace_key: str
         Name of the namespace in framework states that the model will be using.
     language: str

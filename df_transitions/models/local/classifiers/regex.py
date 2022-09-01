@@ -1,8 +1,9 @@
 """
-Regex Model
-----------------
+Regex Classifier
+*****************
 
-This module provides a regex-based label model version.
+This module provides a regex-based labelling model.
+Initialize it with a :py:class:`~LabelCollection` with regex-compliant examples.
 """
 import re
 from typing import Optional, Union

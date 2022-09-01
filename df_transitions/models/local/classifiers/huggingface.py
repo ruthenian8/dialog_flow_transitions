@@ -1,8 +1,9 @@
 """
-HuggingFace classifier model
-------------------------------
+HuggingFace classifier
+***********************
 
-TODO: complete
+This module provides an adapter interface for Hugging Face models.
+Use pre-trained NLU classifiers to make the most of your conversational data.
 """
 try:
     from torch.nn import Softmax

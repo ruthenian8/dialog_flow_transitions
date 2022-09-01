@@ -27,11 +27,11 @@ venv:
 	
 
 format: venv
-	$(VENV_PATH)/bin/black --exclude="setup\.py" --line-length=120 .
+	$(VENV_PATH)/bin/black --exclude="setup\.py|venv\/" --line-length=120 .
 .PHONY: format
 
 lint: venv
-	@set -e && $(VENV_PATH)/bin/black --exclude="setup\.py" --line-length=120 --check . || ( \
+	@set -e && $(VENV_PATH)/bin/black --exclude="setup\.py|venv\/" --line-length=120 --check . || ( \
 		echo "================================"; \
 		echo "Bad formatting? Run: make format"; \
 		echo "================================"; \

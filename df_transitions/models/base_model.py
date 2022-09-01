@@ -2,7 +2,8 @@
 Base Model
 ***********
 
-This module implements an abstract base class for intent providers.
+This module defines an abstract interface for label-scoring models, :py:class:`~BaseModel`.
+When defining custom label-scoring models, always inherit from this class.
 """
 from copy import copy
 from abc import ABC, abstractmethod
@@ -16,6 +17,8 @@ from ..utils import LABEL_KEY
 class BaseModel(ABC):
     """
     Base class for label-scoring models.
+    Namespace key should be declared, if you want the scores of your model
+    to be stored in a separate namespace inside the :py:class:`~Context` object.
 
     Parameters
     -----------
