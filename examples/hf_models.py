@@ -10,15 +10,18 @@ from df_transitions.models.local.classifiers.huggingface import HFClassifier
 from df_transitions.models.local.cosine_matchers.huggingface import HFMatcher
 from df_transitions.types import LabelCollection
 from df_transitions import conditions as i_cnd
-
+# TODO: from df_transitions.models import HFMatcher
 from examples import example_utils
 
 logger = logging.getLogger(__name__)
 
+# TODO: add list of real models, need more models. maybe we can wrap model init to replace in the tests
 # We are using this open source model by Obsei-AI
 # to demonstrate, how custom classifiers can be easily adapted for use in df_transitions
-tokenizer = AutoTokenizer.from_pretrained("obsei-ai/sell-buy-intent-classifier-bert-mini")
-model = AutoModelForSequenceClassification.from_pretrained("obsei-ai/sell-buy-intent-classifier-bert-mini")
+def init_model(model = "obsei-ai/sell-buy-intent-classifier-bert-mini"):
+    tokenizer = AutoTokenizer.from_pretrained("obsei-ai/sell-buy-intent-classifier-bert-mini")
+    model = AutoModelForSequenceClassification.from_pretrained("obsei-ai/sell-buy-intent-classifier-bert-mini")
+    return tokenizer, model
 
 common_label_collection = LabelCollection.parse_yaml("examples/data/example.yaml")
 

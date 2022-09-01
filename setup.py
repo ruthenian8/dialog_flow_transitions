@@ -34,14 +34,14 @@ test_requirements = parse_requirements("requirements_test.txt")
 
 
 setup(
-    name="df_transitions",
+    name="df_transitions", # TODO: change name to extended_conditions
     version="0.1.0",
     description=description,
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/ruthenian8/dialog_flow_transitions",
     author="Denis Kuznetsov",
-    author_email="kudep@gmail.com",
+    author_email="kuznetosv.den.p@gmail.com",
     classifiers=[  # Optional
         #   3 - Alpha
         #   4 - Beta

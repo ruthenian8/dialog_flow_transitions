@@ -28,7 +28,7 @@ class RegexModel:
     def __call__(self, request: str, **re_kwargs):
         result = {}
         for label_name, label in self.label_collection.labels.items():
-            matches = [re.search(item, request, **re_kwargs) for item in label.examples]
+            matches = [re.search(item, request, **re_kwargs) for item in label.examples] # TODO: replace compilation to the init
             if any(map(bool, matches)):
                 result[label_name] = 1.0
 

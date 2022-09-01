@@ -11,7 +11,7 @@ STATUS_SUCCESS = 200
 
 LABEL_KEY = "labels"
 
-
+# TODO: use this regexp r"[\w']+|[^\w ]"
 class DefaultTokenizer:
     def __call__(self, string: str):
         return re.split(r"\W+", string=string)

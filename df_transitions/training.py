@@ -14,7 +14,7 @@ except ImportError as e:
     Tokenizer = object
 
 from .types import Label, LabelCollection
-
+# TODO: rm for current release cycle 
 
 class TrainingDataset(Dataset):
     def __init__(self, tokenizer: Tokenizer, label_collection: LabelCollection) -> None:

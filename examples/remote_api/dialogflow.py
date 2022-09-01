@@ -12,6 +12,7 @@ from examples import example_utils
 
 logger = logging.getLogger(__name__)
 
+# TODO: add link to guid for GDF_ACCOUNT_JSON getting and for other APIs
 gdf_model = GoogleDialogFlowModel.from_file(filename=os.getenv("GDF_ACCOUNT_JSON", ""), namespace_key="dialogflow")
 
 script = {

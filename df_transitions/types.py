@@ -17,15 +17,18 @@ try:
 except ImportError:
     from yaml import SafeLoader
 
-
-class Label(BaseModel):
+#  TODO: replace to dataset.py
+class Label(BaseModel): # TODO: DatasetItem
     name: str
-    examples: List[str] = Field(default_factory=list, min_items=1)
+    examples: List[str] = Field(default_factory=list, min_items=1) # TODO: samples
     _categorical_code = PrivateAttr(default=0)
 
 
-class LabelCollection(BaseModel):
-    labels: Dict[str, Label] = Field(default_factory=dict)
+# TODO:`name` to `label`
+# TODO:`examples` to `items` / `samples`
+# TODO: example can be dict or list
+class LabelCollection(BaseModel): # TODO: Dataset
+    labels: Dict[str, Label] = Field(default_factory=dict) # TODO: items
 
     @classmethod
     def _get_path(cls, file: str):

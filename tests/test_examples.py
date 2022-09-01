@@ -8,7 +8,7 @@ import pytest
 sys.path.insert(0, os.pardir)
 
 from examples.example_utils import run_test
-
+# TODO: fix `E   ModuleNotFoundError: No module named 'examples.example_utils'` when tests are running
 
 @pytest.mark.parametrize(
     ["module_name"],

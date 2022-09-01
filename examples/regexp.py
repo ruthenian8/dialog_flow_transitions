@@ -13,6 +13,7 @@ from examples import example_utils
 logger = logging.getLogger(__name__)
 
 # TODO: add examples with raw python objects for regexp classifier
+# TODO: change path to the data, it can be from this dir `current_dir = pathlib.Path(__file__).parent`
 regex_model = RegexClassifier(
     namespace_key="regex", model=RegexModel(LabelCollection.parse_yaml("examples/data/example.yaml"))
 )
