@@ -22,7 +22,7 @@ except ImportError as e:
     PreTrainedModel = None
     IMPORT_ERROR_MESSAGE = e.msg
 
-from ....types import LabelCollection
+from ....dataset import Dataset
 from ...huggingface import BaseHFModel
 from .cosine_matcher_mixin import CosineMatcherMixin
 
@@ -42,7 +42,7 @@ class HFMatcher(CosineMatcherMixin, BaseHFModel):
         Pytorch device object. The device will be used for inference and pre-training.
     namespace_key: str
         Name of the namespace in framework states that the model will be using.
-    label_collection: LabelCollection
+    dataset: Dataset
         Labels for the matcher. The prediction output depends on proximity to different labels.
     tokenizer_kwargs: Optional[dict] = None
         Default tokenizer arguments override.
@@ -56,9 +56,9 @@ class HFMatcher(CosineMatcherMixin, BaseHFModel):
         tokenizer: Tokenizer,
         device: torch.device,
         namespace_key: str,
-        label_collection: LabelCollection,
+        dataset: Dataset,
         tokenizer_kwargs: Optional[dict] = None,
         model_kwargs: Optional[dict] = None,
     ) -> None:
-        CosineMatcherMixin.__init__(self, label_collection=label_collection)
+        CosineMatcherMixin.__init__(self, dataset=dataset)
         BaseHFModel.__init__(self, namespace_key, model, tokenizer, device, tokenizer_kwargs, model_kwargs)

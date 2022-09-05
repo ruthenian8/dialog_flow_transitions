@@ -12,7 +12,7 @@ from typing import Optional
 
 import requests
 
-from ...types import RasaResponse
+from ...utils import RasaResponse
 from ..base_model import BaseModel
 from ...utils import STATUS_SUCCESS, STATUS_UNAVAILABLE
 
@@ -28,7 +28,7 @@ class RasaModel(BaseModel):
     In order to work with this class, you need to have a running instance of Rasa NLU Server
     with the model trained to recognize your intents.
     Please, refer to the `RASA docs <https://rasa.com/docs/rasa/nlu-only-server>`_ on how to
-    launch an NLU-only server.
+    develop a RASA project and launch an NLU-only server.
 
     Parameters
     -----------

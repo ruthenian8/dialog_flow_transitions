@@ -1,4 +1,5 @@
 import logging
+from pathlib import Path
 
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
@@ -6,30 +7,32 @@ from df_engine.core.keywords import RESPONSE, PRE_TRANSITIONS_PROCESSING, GLOBAL
 from df_engine.core import Actor
 from df_engine import conditions as cnd
 
-from df_transitions.models.local.classifiers.huggingface import HFClassifier
-from df_transitions.models.local.cosine_matchers.huggingface import HFMatcher
-from df_transitions.types import LabelCollection
+from df_transitions.models import HFClassifier
+from df_transitions.models import HFMatcher
+from df_transitions.dataset import Dataset
 from df_transitions import conditions as i_cnd
-# TODO: from df_transitions.models import HFMatcher
 from examples import example_utils
 
 logger = logging.getLogger(__name__)
 
-# TODO: add list of real models, need more models. maybe we can wrap model init to replace in the tests
 # We are using this open source model by Obsei-AI
 # to demonstrate, how custom classifiers can be easily adapted for use in df_transitions
-def init_model(model = "obsei-ai/sell-buy-intent-classifier-bert-mini"):
-    tokenizer = AutoTokenizer.from_pretrained("obsei-ai/sell-buy-intent-classifier-bert-mini")
-    model = AutoModelForSequenceClassification.from_pretrained("obsei-ai/sell-buy-intent-classifier-bert-mini")
-    return tokenizer, model
+tokenizer = AutoTokenizer.from_pretrained("obsei-ai/sell-buy-intent-classifier-bert-mini")
+model = AutoModelForSequenceClassification.from_pretrained("obsei-ai/sell-buy-intent-classifier-bert-mini")
+# However, you can use any classification model that is accessible via the Hugging Face hub
+# Below, we list some of the most popular open-source models that can power your conversational logic
+#
+#
+# unitary/toxic-bert - toxic speech detection
+# ProsusAI/finbert - sentiment analysis of financial texts
+# twitter-roberta-base-irony - irony detection
 
-common_label_collection = LabelCollection.parse_yaml("examples/data/example.yaml")
+data_path = Path(__file__).parent.joinpath("data/example.json")
+common_label_collection = Dataset.parse_json(data_path)
 
 model_1 = HFClassifier(namespace_key="hf_classifier", tokenizer=tokenizer, model=model)
 
-model_2 = HFMatcher(
-    namespace_key="hf_matcher", label_collection=common_label_collection, tokenizer=tokenizer, model=model
-)
+model_2 = HFMatcher(namespace_key="hf_matcher", dataset=common_label_collection, tokenizer=tokenizer, model=model)
 
 
 script = {

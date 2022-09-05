@@ -34,7 +34,7 @@ test_requirements = parse_requirements("requirements_test.txt")
 
 
 setup(
-    name="df_transitions", # TODO: change name to extended_conditions
+    name="df_extended_conditions",
     version="0.1.0",
     description=description,
     long_description=long_description,

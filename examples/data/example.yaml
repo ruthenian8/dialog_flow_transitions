@@ -1,19 +1,19 @@
-labels:
-  - name: hello
-    examples:
+items:
+  - label: hello
+    samples:
       - hi there
       - hi
       - hello
       - hello there
 
-  - name: goodbye
-    examples:
+  - label: goodbye
+    samples:
       - bye
       - see you
       - goodbye
 
-  - name: food
-    examples:
+  - label: food
+    samples:
       - something to eat
       - have a snack
       - have a meal

@@ -17,7 +17,7 @@ except ImportError as e:
     IMPORT_ERROR_MESSAGE = e.msg
 
 from ...sklearn import BaseSklearnModel
-from ....types import LabelCollection
+from ....dataset import Dataset
 from .cosine_matcher_mixin import CosineMatcherMixin
 
 
@@ -30,7 +30,7 @@ class SklearnMatcher(CosineMatcherMixin, BaseSklearnModel):
     -----------
     model: Optional[BaseEstimator]
         Sklearn-type model
-    label_collection: LabelCollection
+    dataset: Dataset
         Labels for the matcher. The prediction output depends on proximity to different labels.
     tokenizer: Optional[Union[BaseEstimator, Pipeline]] = None
         An Sklearn-type tokenizer, like TdidfVectorizer or CountVectorizer. Can also be a product
@@ -42,9 +42,9 @@ class SklearnMatcher(CosineMatcherMixin, BaseSklearnModel):
     def __init__(
         self,
         model: Optional[BaseEstimator] = None,
-        label_collection: Optional[LabelCollection] = None,
+        dataset: Optional[Dataset] = None,
         tokenizer: Optional[Union[BaseEstimator, Pipeline]] = None,
         namespace_key: Optional[str] = None,
     ) -> None:
-        CosineMatcherMixin.__init__(self, label_collection=label_collection)
+        CosineMatcherMixin.__init__(self, dataset=dataset)
         BaseSklearnModel.__init__(self, model=model, tokenizer=tokenizer, namespace_key=namespace_key)

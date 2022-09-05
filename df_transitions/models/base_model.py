@@ -10,7 +10,7 @@ from abc import ABC, abstractmethod
 
 from df_engine.core import Context, Actor
 
-from ..types import LabelCollection
+from ..dataset import Dataset
 from ..utils import LABEL_KEY
 
 
@@ -46,7 +46,7 @@ class BaseModel(ABC):
         """
         raise NotImplementedError
 
-    def fit(self, label_collection: LabelCollection) -> None:
+    def fit(self, dataset: Dataset) -> None:
         """
         Reinitialize the inner model with the given data.
         """

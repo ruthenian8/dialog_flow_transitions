@@ -4,7 +4,7 @@ import pytest
 from pydantic import parse_obj_as
 from df_engine.core import Context
 from df_transitions.utils import LABEL_KEY
-from df_transitions.types import Label, LabelCollection
+from df_transitions.dataset import DatasetItem, Dataset
 from df_transitions.conditions import has_cls_label, has_match
 
 
@@ -12,9 +12,9 @@ from df_transitions.conditions import has_cls_label, has_match
     ["input"],
     [
         ("a",),
-        (Label(name="a", examples=["a"]),),
+        (DatasetItem(label="a", samples=["a"]),),
         (["a", "b"],),
-        ([Label(name="a", examples=["a"]), Label(name="b", examples=["b"])],),
+        ([DatasetItem(label="a", samples=["a"]), DatasetItem(label="b", samples=["b"])],),
     ],
 )
 def test_conditions(input, testing_actor):
@@ -47,8 +47,8 @@ def test_has_match(_input: dict, testing_actor, thresh, standard_model, last_req
     ctx.add_request(last_request)
     # Per default, we assume that the model has already been fit.
     # For this test case we fit it manually.
-    collection = LabelCollection(
-        labels=parse_obj_as(List[Label], [{"name": key, "examples": values} for key, values in _input.items()])
+    collection = Dataset(
+        items=parse_obj_as(List[DatasetItem], [{"label": key, "samples": values} for key, values in _input.items()])
     )
     standard_model.fit(collection)
     result = has_match(standard_model, threshold=thresh, **_input)(ctx, testing_actor)

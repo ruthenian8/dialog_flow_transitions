@@ -30,7 +30,8 @@ class GoogleDialogFlowModel(BaseModel):
     --------------
     Note, that before you use the class, you need to set up a Dialogflow project,
     create intents, and train a language model, which can be easily done
-    using the Dialogflow web interface.
+    using the Dialogflow web interface (see the official
+    `instructions <https://cloud.google.com/dialogflow/es/docs/quick/build-agent>`_).
     After this is done, you should obtain a service account JSON file from Google
     and pass it to this class, using `from_file` method.
 

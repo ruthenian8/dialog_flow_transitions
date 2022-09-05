@@ -11,7 +11,6 @@ from examples import example_utils
 
 logger = logging.getLogger(__name__)
 
-# TODO: Add description link
 rasa_model = RasaModel(model="http://localhost:5005", namespace_key="rasa")
 
 script = {

@@ -1,45 +1,25 @@
-# TODO: name of the file wiht `_` 
 import logging
+from pathlib import Path
 
 from df_engine.core.keywords import RESPONSE, PRE_TRANSITIONS_PROCESSING, GLOBAL, TRANSITIONS, LOCAL
 from df_engine.core import Actor
 from df_engine import conditions as cnd
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
 
-from df_transitions.models.local.classifiers.sklearn import SklearnClassifier
-from df_transitions.models.local.cosine_matchers.sklearn import SklearnMatcher
-from df_transitions.types import LabelCollection
+from df_transitions.models.local.classifiers.regex import RegexClassifier, RegexModel
+from df_transitions.dataset import Dataset
 from df_transitions import conditions as i_cnd
 
 from examples import example_utils
 
 logger = logging.getLogger(__name__)
 
-common_collection = LabelCollection.parse_yaml("examples/data/example.yaml")
-
-classifier = SklearnClassifier(
-    tokenizer=TfidfVectorizer(stop_words=["to"]), model=LogisticRegression(class_weight="balanced"), namespace_key="skc"
-)
-# When using sklearn, you have to pass in trained models or initialize the models with your label data.
-# To achieve this, pass the label collection to the 'fit' method.
-classifier.fit(common_collection)
-matcher = SklearnMatcher(
-    tokenizer=TfidfVectorizer(stop_words=["to"]), label_collection=common_collection, namespace_key="skm"
-)
-matcher.fit(common_collection)
-
+data_path = Path(__file__).parent.joinpath("data/example.yaml")
+regex_model = RegexClassifier(namespace_key="regex", model=RegexModel(Dataset.parse_yaml(data_path)))
 
 script = {
     GLOBAL: {
-        PRE_TRANSITIONS_PROCESSING: {
-            "get_labels_1": classifier,
-            "get_labels_2": matcher,
-        },
-        TRANSITIONS: {
-            ("food", "offer", 1.2): i_cnd.has_cls_label("food", threshold=0.5, namespace="skc"),
-            ("food", "offer", 1.2): i_cnd.has_match(matcher, ["I want to eat"], threshold=0.6),
-        },
+        PRE_TRANSITIONS_PROCESSING: {"get_intents": regex_model},
+        TRANSITIONS: {("food", "offer", 1.2): i_cnd.has_cls_label("food")},
     },
     "root": {
         LOCAL: {TRANSITIONS: {("service", "offer", 1.2): cnd.true()}},
@@ -63,7 +43,7 @@ script = {
     },
 }
 
-actor = Actor(script, start_label=("root", "start"), fallback_label=("root", "fallback"), validation_stage=False)
+actor = Actor(script, start_label=("root", "start"), fallback_label=("root", "fallback"))
 
 
 testing_dialogue = [

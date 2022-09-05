@@ -16,9 +16,17 @@ jobs:
       HF_API_KEY: ${{ secrets.HF_API_KEY }}
       GDF_ACCOUNT_JSON: ${{ secrets.GDF_ACCOUNT_JSON }}
       RASA_URL: ${{ secrets.RASA_URL }}
+      DOCKER_USER: ${{ secrets.DOCKER_USER }}
+      DOCKER_PASS: ${{ secrets.DOCKER_PASSWORD }}
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: build_images
+        run: docker build -t myrasa . && docker run -d -p 5005:5005 --name rasa myrasa
+
+      - name: check running containers
+        run: docker ps -a
 
       - name: set up python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
@@ -44,3 +52,6 @@ jobs:
             make test
           fi
         shell: bash
+      
+      - name: stop containers
+        run: docker stop rasa

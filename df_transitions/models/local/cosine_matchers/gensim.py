@@ -21,7 +21,7 @@ except ImportError as e:
     ALL_MODELS = []
 
 from ...base_model import BaseModel
-from ....types import LabelCollection
+from ....dataset import Dataset
 from ....utils import DefaultTokenizer
 from .cosine_matcher_mixin import CosineMatcherMixin
 
@@ -35,7 +35,7 @@ class GensimMatcher(CosineMatcherMixin, BaseModel):
     -----------
     model: gensim.models.word2vec.Word2Vec
         Gensim vector model (Word2Vec, FastText, etc.)
-    label_collection: LabelCollection
+    dataset: Dataset
         Labels for the matcher. The prediction output depends on proximity to different labels.
     tokenizer: Optional[Callable[[str], List[str]]]
         Class or function that performs string tokenization.
@@ -48,7 +48,7 @@ class GensimMatcher(CosineMatcherMixin, BaseModel):
     def __init__(
         self,
         model: Word2Vec,
-        label_collection: LabelCollection,
+        dataset: Dataset,
         tokenizer: Optional[Callable[[str], List[str]]] = None,
         namespace_key: Optional[str] = None,
         **kwargs,
@@ -56,17 +56,22 @@ class GensimMatcher(CosineMatcherMixin, BaseModel):
         IMPORT_ERROR_MESSAGE = globals().get("IMPORT_ERROR_MESSAGE")
         if IMPORT_ERROR_MESSAGE is not None:
             raise ImportError(IMPORT_ERROR_MESSAGE)
-        CosineMatcherMixin.__init__(self, label_collection=label_collection)
+        CosineMatcherMixin.__init__(self, dataset=dataset)
         BaseModel.__init__(self, namespace_key=namespace_key)
         self.model = model
         self.tokenizer = tokenizer or DefaultTokenizer()
-        # self.fit(self.label_collection, **kwargs)
+        # self.fit(self.dataset, **kwargs)
 
     def transform(self, request: str):
         return self.model.wv.get_mean_vector(self.tokenizer(request))
 
-    def fit(self, label_collection: LabelCollection, **kwargs) -> None:
-        sentences = [example for label in label_collection.labels.values() for example in label.examples]
+    def fit(self, dataset: Dataset, **kwargs) -> None:
+        """
+        In case with GensimMatcher, using `fit` method implies that the model
+        will be retrained and the previous state of the model will be discarded.
+        The init arguments of the model are supposed to be passed as kwargs.
+        """
+        sentences, _ = map(list, zip(*dataset.flat_items))
         tokenized_sents = list(map(self.tokenizer, sentences))
         self.model = self.model.__class__(**kwargs)
         self.model.build_vocab(tokenized_sents)
@@ -74,7 +79,7 @@ class GensimMatcher(CosineMatcherMixin, BaseModel):
 
     def save(self, path: str):
         self.model.save(path)
-        joblib.dump(self.label_collection, f"{path}.labels")
+        joblib.dump(self.dataset, f"{path}.data")
         joblib.dump(self.tokenizer, f"{path}.tokenizer")
 
     @classmethod
@@ -82,13 +87,13 @@ class GensimMatcher(CosineMatcherMixin, BaseModel):
         with open(path, "rb") as picklefile:
             contents = picklefile.readline()  # get the header line, find the class name inside
         for name in ALL_MODELS:
-            if bytes(name, encoding="uft-8") in contents:
+            if bytes(name, encoding="utf-8") in contents:
                 model_cls: type = getattr(gensim.models, name)
                 break
         else:
             raise ValueError(f"No matching model found for file {path}")
 
         model = model_cls.load(path)
-        label_collection = joblib.load(f"{path}.labels")
+        dataset = joblib.load(f"{path}.data")
         tokenizer = joblib.load(f"{path}.tokenizer")
-        return cls(model=model, tokenizer=tokenizer, label_collection=label_collection, namespace_key=namespace_key)
+        return cls(model=model, tokenizer=tokenizer, dataset=dataset, namespace_key=namespace_key)

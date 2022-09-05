@@ -4,26 +4,26 @@ import sys
 import pytest
 from sklearn.feature_extraction.text import TfidfVectorizer
 from df_transitions.models.local.cosine_matchers.sklearn import SklearnMatcher
-from df_transitions.types import LabelCollection
+from df_transitions.dataset import Dataset
 
 sys.path.insert(0, os.path.pardir)
 
 
 @pytest.fixture(scope="session")
 def testing_actor():
-    from examples.regexp import actor
+    from examples.base_example import actor
 
     yield actor
 
 
 @pytest.fixture(scope="session")
-def testing_collection():
-    yield LabelCollection.parse_yaml("./examples/data/example.yaml")
+def testing_dataset():
+    yield Dataset.parse_yaml("./examples/data/example.yaml")
 
 
 @pytest.fixture(scope="session")
-def standard_model(testing_collection):
-    yield SklearnMatcher(tokenizer=TfidfVectorizer(stop_words=None), label_collection=testing_collection)
+def standard_model(testing_dataset):
+    yield SklearnMatcher(tokenizer=TfidfVectorizer(stop_words=None), dataset=testing_dataset)
 
 
 @pytest.fixture(scope="session")

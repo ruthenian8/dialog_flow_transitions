@@ -10,7 +10,7 @@ except ImportError:
 
 from df_transitions.models.local.classifiers.sklearn import SklearnClassifier
 from df_transitions.models.local.cosine_matchers.sklearn import SklearnMatcher
-from df_transitions.types import LabelCollection
+from df_transitions.dataset import Dataset
 
 
 @pytest.fixture(scope="session")
@@ -20,11 +20,11 @@ def testing_classifier():
 
 
 @pytest.fixture(scope="session")
-def testing_model(testing_collection):
+def testing_model(testing_dataset):
     model = SklearnMatcher(
         model=None,
         tokenizer=TfidfVectorizer(),
-        label_collection=testing_collection,
+        dataset=testing_dataset,
         namespace_key="model",
     )
     yield model
@@ -43,9 +43,9 @@ def test_saving(save_file: str, testing_classifier: SklearnClassifier, testing_m
     assert new_classifier.namespace_key == testing_classifier.namespace_key
 
 
-def test_fit(testing_classifier: SklearnClassifier, testing_model: SklearnMatcher, testing_collection: LabelCollection):
-    tc_result = testing_classifier.fit(testing_collection)
-    ts_result = testing_model.fit(testing_collection)
+def test_fit(testing_classifier: SklearnClassifier, testing_model: SklearnMatcher, testing_dataset: Dataset):
+    tc_result = testing_classifier.fit(testing_dataset)
+    ts_result = testing_model.fit(testing_dataset)
     assert tc_result == ts_result == None
 
 

@@ -10,7 +10,7 @@ from functools import singledispatch
 from sklearn.metrics.pairwise import cosine_similarity
 from df_engine.core import Context, Actor
 
-from .types import Label
+from .dataset import DatasetItem
 from .utils import LABEL_KEY
 from .models.base_model import BaseModel
 
@@ -24,10 +24,10 @@ def has_cls_label(label, namespace: Optional[str] = None, threshold: float = 0.9
     Parameters
     -----------
     label: Any
-        String name or a reference to a Label object, or a collection thereof.
+        String name or a reference to a DatasetItem object, or a collection thereof.
     namespace: Optional[str]
-        Namespace key of a particular model that should detect the label.
-        If not set, all namespaces will be searched for the required label.
+        Namespace key of a particular model that should detect the dataset_item.
+        If not set, all namespaces will be searched for the required dataset_item.
     threshold: float = 0.9
         The minimal label probability that triggers a positive response
         from the function.
@@ -49,14 +49,14 @@ def _(label, namespace: Optional[str] = None, threshold: float = 0.9):
     return has_cls_label_innner
 
 
-@has_cls_label.register(Label)
+@has_cls_label.register(DatasetItem)
 def _(label, namespace: Optional[str] = None, threshold: float = 0.9) -> Callable[[Context, Actor], bool]:
     def has_cls_label_innner(ctx: Context, actor: Actor) -> bool:
         if LABEL_KEY not in ctx.framework_states:
             return False
         if namespace is not None:
-            return ctx.framework_states[LABEL_KEY].get(namespace, {}).get(label.name, 0) >= threshold
-        scores = [item.get(label.name, 0) for item in ctx.framework_states[LABEL_KEY].values()]
+            return ctx.framework_states[LABEL_KEY].get(namespace, {}).get(label.label, 0) >= threshold
+        scores = [item.get(label.label, 0) for item in ctx.framework_states[LABEL_KEY].values()]
         comparison_array = [item >= threshold for item in scores]
         return any(comparison_array)
 

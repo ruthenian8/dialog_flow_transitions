@@ -42,7 +42,7 @@ However, some of the parameters are class-specific.
 
  - The `tokenizer` parameter is only required for Sklearn, Gensim, and Hugging Face models. See the signature of the corresponding classes for more information.
  - `device` parameter is only required for Hugging Face models. Use torch.device("cpu") or torch.device("cuda").
- - `label_collection` should be passed to all cosine matchers, so that they have a pre-defined set of labels and examples, against which user utterances will be compared.
+ - `dataset` should be passed to all cosine matchers, so that they have a pre-defined set of labels and examples, against which user utterances will be compared.
 
 Using the library, you can deploy models locally.
 

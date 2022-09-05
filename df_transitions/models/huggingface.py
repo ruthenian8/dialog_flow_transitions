@@ -26,7 +26,7 @@ except ImportError as e:
     IMPORT_ERROR_MESSAGE = e.msg
 
 from .base_model import BaseModel
-from ..types import LabelCollection
+from ..dataset import Dataset
 
 
 class BaseHFModel(BaseModel):
@@ -82,7 +82,7 @@ class BaseHFModel(BaseModel):
         )
         return output
 
-    def fit(self, label_collection: LabelCollection) -> None:
+    def fit(self, dataset: Dataset) -> None:
         raise NotImplementedError
 
     def save(self, path: str, **kwargs) -> None:
