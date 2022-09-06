@@ -3,8 +3,8 @@ import sys
 
 import pytest
 from sklearn.feature_extraction.text import TfidfVectorizer
-from df_transitions.models.local.cosine_matchers.sklearn import SklearnMatcher
-from df_transitions.dataset import Dataset
+from df_extended_conditions.models.local.cosine_matchers.sklearn import SklearnMatcher
+from df_extended_conditions.dataset import Dataset
 
 sys.path.insert(0, os.path.pardir)
 

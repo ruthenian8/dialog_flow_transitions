@@ -6,7 +6,7 @@ try:
 except ImportError:
     pytest.skip(allow_module_level=True)
 
-from df_transitions.models.remote_api.google_dialogflow_model import GoogleDialogFlowModel
+from df_extended_conditions.models.remote_api.google_dialogflow_model import GoogleDialogFlowModel
 
 
 @pytest.fixture(scope="session")

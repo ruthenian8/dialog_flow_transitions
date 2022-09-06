@@ -44,7 +44,7 @@ class RegexClassifier(BaseModel):
     Parameters
     -----------
     model: RegexModel
-        An instance of df_transitions' RegexModel.
+        An instance of df_extended_conditions' RegexModel.
     namespace_key: Optional[str]
         Name of the namespace in framework states that the model will be using.
     re_kwargs: Optional[dict]

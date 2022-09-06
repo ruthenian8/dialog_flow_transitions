@@ -1,6 +1,6 @@
 from df_runner import ScriptRunner
 
-from examples.regexp import regex_model, script
+from examples.base_example import regex_model, script
 
 # TODO: waiting for new version of runner
 runner = ScriptRunner(

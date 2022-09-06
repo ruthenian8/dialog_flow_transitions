@@ -3,7 +3,7 @@ import os
 import requests
 import pytest
 
-from df_transitions.models.remote_api.rasa_model import RasaModel
+from df_extended_conditions.models.remote_api.rasa_model import RasaModel
 
 RASA_URL = os.getenv("RASA_URL")
 if RASA_URL is None or isinstance(RASA_URL, str) and requests.get(RASA_URL).status_code != 200:

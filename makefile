@@ -1,7 +1,7 @@
 SHELL = /bin/bash
 
 VENV_PATH = venv
-VERSIONING_FILES =  setup.py makefile docs/source/conf.py df_transitions/__init__.py
+VERSIONING_FILES =  setup.py makefile docs/source/conf.py df_extended_conditions/__init__.py
 CURRENT_VERSION = 0.1.0 
 
 help:
@@ -21,7 +21,7 @@ help:
 venv:
 	echo "Start creating virtual environment";\
 	python3 -m venv $(VENV_PATH);\
-	$(VENV_PATH)/bin/pip install -e . ;
+	$(VENV_PATH)/bin/pip install -e .[all] ;
 	$(VENV_PATH)/bin/pip install -r requirements_dev.txt ;
 	$(VENV_PATH)/bin/pip install -r requirements_test.txt ;
 	
@@ -36,19 +36,19 @@ lint: venv
 		echo "Bad formatting? Run: make format"; \
 		echo "================================"; \
 		false)
-	$(VENV_PATH)/bin/mypy df_transitions/
+	$(VENV_PATH)/bin/mypy df_extended_conditions/
 
 .PHONY: lint
 
 test: venv
-	$(VENV_PATH)/bin/pytest --cov-report html -p no:warnings --cov-report term --cov=df_transitions tests/
+	$(VENV_PATH)/bin/pytest --cov-report html -p no:warnings --cov-report term --cov=df_extended_conditions tests/
 .PHONY: test
 
 test_all: venv test lint
 .PHONY: test_all
 
 doc: venv
-	$(VENV_PATH)/bin/sphinx-apidoc -e -f -o docs/source/apiref df_transitions
+	$(VENV_PATH)/bin/sphinx-apidoc -e -f -o docs/source/apiref df_extended_conditions
 	$(VENV_PATH)/bin/sphinx-build -M clean docs/source docs/build
 	$(VENV_PATH)/bin/sphinx-build -M html docs/source docs/build
 .PHONY: doc

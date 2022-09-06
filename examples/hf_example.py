@@ -7,16 +7,16 @@ from df_engine.core.keywords import RESPONSE, PRE_TRANSITIONS_PROCESSING, GLOBAL
 from df_engine.core import Actor
 from df_engine import conditions as cnd
 
-from df_transitions.models import HFClassifier
-from df_transitions.models import HFMatcher
-from df_transitions.dataset import Dataset
-from df_transitions import conditions as i_cnd
+from df_extended_conditions.models import HFClassifier
+from df_extended_conditions.models import HFMatcher
+from df_extended_conditions.dataset import Dataset
+from df_extended_conditions import conditions as i_cnd
 from examples import example_utils
 
 logger = logging.getLogger(__name__)
 
 # We are using this open source model by Obsei-AI
-# to demonstrate, how custom classifiers can be easily adapted for use in df_transitions
+# to demonstrate, how custom classifiers can be easily adapted for use in df_extended_conditions
 tokenizer = AutoTokenizer.from_pretrained("obsei-ai/sell-buy-intent-classifier-bert-mini")
 model = AutoModelForSequenceClassification.from_pretrained("obsei-ai/sell-buy-intent-classifier-bert-mini")
 # However, you can use any classification model that is accessible via the Hugging Face hub

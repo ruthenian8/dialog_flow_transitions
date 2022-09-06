@@ -11,10 +11,10 @@
 ![Python 3.6, 3.7, 3.8, 3.9](https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9-green.svg)
 
 <!-- TODO: uncomment one of these to add badges to your project description -->
-<!-- [![Documentation Status](https://df_transitions.readthedocs.io/en/stable/?badge=stable)]() See readthedocs.io -->
+<!-- [![Documentation Status](https://df_extended_conditions.readthedocs.io/en/stable/?badge=stable)]() See readthedocs.io -->
 <!-- [![Coverage Status]()]() See coveralls.io -->
-<!-- [![PyPI](https://img.shields.io/pypi/v/df_transitions)](https://pypi.org/project/df_transitions/) -->
-<!-- [![Downloads](https://pepy.tech/badge/df_transitions)](https://pepy.tech/project/df_transitions) -->
+<!-- [![PyPI](https://img.shields.io/pypi/v/df_extended_conditions)](https://pypi.org/project/df_extended_conditions/) -->
+<!-- [![Downloads](https://pepy.tech/badge/df_extended_conditions)](https://pepy.tech/project/df_extended_conditions) -->
 
 # Quick Start
 ## Installation
@@ -23,12 +23,12 @@ The default installation option is to install the package with no dependencies, 
 machine learning libraries take up a lot of space. However, you can install the package with one or several extras, all of which are listed below.
 
 ```bash
-pip install df_transitions
-pip install df_transitions[dialogflow] # google dialogflow
-pip install df_transitions[hf] # hugging face
-pip install df_transitions[gensim] # gensim
-pip install df_transitions[sklearn] #sklearn
-pip install df_transitions[all] # all of the above
+pip install df_extended_conditions
+pip install df_extended_conditions[dialogflow] # google dialogflow
+pip install df_extended_conditions[hf] # hugging face
+pip install df_extended_conditions[gensim] # gensim
+pip install df_extended_conditions[sklearn] #sklearn
+pip install df_extended_conditions[all] # all of the above
 ```
 
 ## Instantiate a model
@@ -86,7 +86,7 @@ The extracted values can be accessed in all functions where `Context` is used.
 We provide several such functions that can be leveraged as transition conditions.
 
 ```python
-from df_transitions.conditions import has_cls_label
+from df_extended_conditions.conditions import has_cls_label
 
 script = {
     "root": {

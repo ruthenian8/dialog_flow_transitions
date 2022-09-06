@@ -63,7 +63,7 @@ class GensimMatcher(CosineMatcherMixin, BaseModel):
         # self.fit(self.dataset, **kwargs)
 
     def transform(self, request: str):
-        return self.model.wv.get_mean_vector(self.tokenizer(request))
+        return self.model.wv.get_mean_vector(self.tokenizer(request)).reshape(1, -1)
 
     def fit(self, dataset: Dataset, **kwargs) -> None:
         """

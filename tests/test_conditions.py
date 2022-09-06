@@ -3,9 +3,9 @@ from typing import List
 import pytest
 from pydantic import parse_obj_as
 from df_engine.core import Context
-from df_transitions.utils import LABEL_KEY
-from df_transitions.dataset import DatasetItem, Dataset
-from df_transitions.conditions import has_cls_label, has_match
+from df_extended_conditions.utils import LABEL_KEY
+from df_extended_conditions.dataset import DatasetItem, Dataset
+from df_extended_conditions.conditions import has_cls_label, has_match
 
 
 @pytest.mark.parametrize(

@@ -30,7 +30,7 @@ class CosineMatcherMixin:
     def predict(self, request: str) -> dict:
         request_cls_embedding = self.transform(request)
         result = dict()
-        for label_name, label in self.dataset.items.items():
+        for label_name, dataset_item in self.dataset.items.items():
             reference_examples = dataset_item.samples
             reference_embeddings = [self.transform(item) for item in reference_examples]
             cosine_scores = [

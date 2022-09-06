@@ -5,9 +5,9 @@ from df_engine.core.keywords import RESPONSE, PRE_TRANSITIONS_PROCESSING, GLOBAL
 from df_engine.core import Actor
 from df_engine import conditions as cnd
 
-from df_transitions.models.local.classifiers.regex import RegexClassifier, RegexModel
-from df_transitions.dataset import Dataset
-from df_transitions import conditions as i_cnd
+from df_extended_conditions.models.local.classifiers.regex import RegexClassifier, RegexModel
+from df_extended_conditions.dataset import Dataset
+from df_extended_conditions import conditions as i_cnd
 
 from examples import example_utils
 

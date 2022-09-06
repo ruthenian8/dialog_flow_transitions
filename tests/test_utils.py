@@ -9,7 +9,7 @@ except ImportError as e:
     IMPORT_ERROR_MESSAGE = e.msg
 
 
-from df_transitions.dataset import Dataset
+from df_extended_conditions.dataset import Dataset
 
 
 @pytest.mark.parametrize(

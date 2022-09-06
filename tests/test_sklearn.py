@@ -8,9 +8,9 @@ try:
 except ImportError:
     pytest.skip(allow_module_level=True)
 
-from df_transitions.models.local.classifiers.sklearn import SklearnClassifier
-from df_transitions.models.local.cosine_matchers.sklearn import SklearnMatcher
-from df_transitions.dataset import Dataset
+from df_extended_conditions.models.local.classifiers.sklearn import SklearnClassifier
+from df_extended_conditions.models.local.cosine_matchers.sklearn import SklearnMatcher
+from df_extended_conditions.dataset import Dataset
 
 
 @pytest.fixture(scope="session")

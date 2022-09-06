@@ -5,8 +5,8 @@ from df_engine.core.keywords import RESPONSE, PRE_TRANSITIONS_PROCESSING, GLOBAL
 from df_engine.core import Actor
 from df_engine import conditions as cnd
 
-from df_transitions.models.remote_api.google_dialogflow_model import GoogleDialogFlowModel
-from df_transitions import conditions as i_cnd
+from df_extended_conditions.models.remote_api.google_dialogflow_model import GoogleDialogFlowModel
+from df_extended_conditions import conditions as i_cnd
 
 from examples import example_utils
 

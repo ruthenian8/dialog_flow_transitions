@@ -1,6 +1,6 @@
 import pytest
 
-from df_transitions.models.remote_api.hf_api_model import HFAPIModel
+from df_extended_conditions.models.remote_api.hf_api_model import HFAPIModel
 
 
 @pytest.fixture(scope="session")

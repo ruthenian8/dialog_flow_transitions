@@ -91,7 +91,7 @@ def has_match(
     Parameters
     -----------
     model: BaseModel
-        df_transitions' model. Use one of the models from the `cosine_matchers` subpackage.
+        df_extended_conditions' model. Use one of the models from the `cosine_matchers` subpackage.
     positive_examples: Optional[List[str]]
         A list of phrases that an utterance should be close to.
     negative_examples: Optional[List[str]] = None

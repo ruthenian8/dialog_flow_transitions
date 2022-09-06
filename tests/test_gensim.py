@@ -1,7 +1,7 @@
 import pytest
 
-from df_transitions.models.local.cosine_matchers.gensim import GensimMatcher
-from df_transitions.dataset import Dataset
+from df_extended_conditions.models.local.cosine_matchers.gensim import GensimMatcher
+from df_extended_conditions.dataset import Dataset
 
 try:
     import numpy as np

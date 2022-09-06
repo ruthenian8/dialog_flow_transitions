@@ -7,10 +7,10 @@ from df_engine import conditions as cnd
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 
-from df_transitions.models import SklearnClassifier
-from df_transitions.models import SklearnMatcher
-from df_transitions.dataset import Dataset
-from df_transitions import conditions as i_cnd
+from df_extended_conditions.models import SklearnClassifier
+from df_extended_conditions.models import SklearnMatcher
+from df_extended_conditions.dataset import Dataset
+from df_extended_conditions import conditions as i_cnd
 
 from examples import example_utils
 
