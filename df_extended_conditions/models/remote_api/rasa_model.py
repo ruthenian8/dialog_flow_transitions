@@ -4,7 +4,7 @@ Rasa Annotator
 
 This module provides an annotator that queries an external RASA Server for intent detection.
 """
-import uuid
+import asyncio
 import time
 import json
 from urllib.parse import urljoin
@@ -12,12 +12,21 @@ from typing import Optional
 
 import requests
 
+try:
+    import httpx
+
+    IMPORT_ERROR_MESSAGE = None
+except ImportError as e:
+    htppx = object()
+    IMPORT_ERROR_MESSAGE = e.msg
+
 from ...utils import RasaResponse
 from ..base_model import BaseModel
 from ...utils import STATUS_SUCCESS, STATUS_UNAVAILABLE
+from .async_mixin import AsyncMixin
 
 
-class RasaModel(BaseModel):
+class AbstractRasaModel(BaseModel):
     """
     RasaModel
     -----------
@@ -68,6 +77,8 @@ class RasaModel(BaseModel):
             self.headers["Authorization"] = "Bearer " + jwt_token
         self.retries = retries
 
+
+class RasaModel(AbstractRasaModel):
     def predict(self, request: str) -> dict:
         message = {"text": request}
         retries = 0
@@ -84,4 +95,42 @@ class RasaModel(BaseModel):
         json_response = response.json()
         parsed = RasaResponse.parse_obj(json_response)
         result = {item.name: item.confidence for item in parsed.intent_ranking} if parsed.intent_ranking else dict()
+        return result
+
+
+class AsyncRasaModel(AsyncMixin, AbstractRasaModel):
+    def __init__(
+        self,
+        model: str,
+        api_key: Optional[str] = None,
+        jwt_token: Optional[str] = None,
+        namespace_key: Optional[str] = None,
+        *,
+        retries: int = 10,
+        headers: Optional[dict] = None,
+    ):
+        IMPORT_ERROR_MESSAGE = globals().get("IMPORT_ERROR_MESSAGE")
+        if IMPORT_ERROR_MESSAGE is not None:
+            raise ImportError(IMPORT_ERROR_MESSAGE)
+        super().__init__(model, api_key, jwt_token, namespace_key, retries=retries, headers=headers)
+
+    async def predict(self, request: str) -> dict:
+        client = httpx.AsyncClient()
+        message = {"text": request}
+        retries = 0
+        while retries < self.retries:
+            retries += 1
+            response: httpx.Response = await client.post(self.parse_url, headers=self.headers, data=json.dumps(message))
+            if response.status_code == STATUS_UNAVAILABLE:  # Wait for model to warm up
+                await asyncio.sleep(1)
+            elif response.status_code == STATUS_SUCCESS:
+                break
+            else:
+                raise httpx.HTTPStatusError(str(response.status_code) + " " + response.text)
+
+        json_response = response.json()
+        parsed = RasaResponse.parse_obj(json_response)
+        result = {item.name: item.confidence for item in parsed.intent_ranking} if parsed.intent_ranking else dict()
+
+        await client.aclose()
         return result

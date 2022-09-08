@@ -67,10 +67,10 @@ rasa_model = RasaModel(
 )
 ```
 
+## Use the Model class in your Script graph
+
 The model class is designed to be used in the `PRE_TRANSITION_PROCESSING` section of the dialogue script graph.
 Put it into the `GLOBAL` node to query the model each turn, or into a more specific node to perform queries solely at the chosen stages of the dialogue.
-
-## Use the Model class in your Script graph
 
 ```python
 script = {
@@ -101,6 +101,43 @@ script = {
 ```
 
 To get more advanced examples, take a look at [examples](examples) on GitHub.
+
+# Custom classifier / matcher
+
+In order to create your own classifier, create a child class of the `BaseModel` abstract type. 
+
+`BaseModel` only has one abstract method, `predict`, that should necessarily be overridden. The signature of the method is the following: it takes a request string and returns a dictionary of class labels and their respective probabilities. 
+
+You can override the rest of the methods, namely `save`, `load`, `fit` and `transform` at your own convenience, e.g. lack of those will not raise an error. 
+* `fit` should take a new dataset and retrain / update the underlying model.
+* `transform` should take a request string and produce a vector.
+* `save` and `load` are self-explanatory.
+
+```python
+class MyCustomClassifier(BaseModel)
+    def predict(self, request: str) -> dict:
+        probs = get_probs(request)
+        return probs
+```
+
+As for your own cosine matcher, to build one, you should inherit from the `CosineMatcherMixin` and from the `BaseModel`, with the former taking precedence. This requires the `__init__` method to take `dataset` argument.
+
+In your class, override the `transform` method that is used to obtain a two-dimensional vector (optimally, a Numpy array) from a string. Unlike the classifier case, the `predict` method is already implemented for you, so you don't have to tamper with it.
+
+Those two steps should suffice to get your matcher up and running.
+
+```python
+class MyCustomMatcher(CosineMatcherMixin, BaseModel):
+    def __init__(self, model, dataset, namespace_key) -> None:
+        CosineMatcherMixin.__init__(self, dataset)
+        BaseModel.__init__(self, namespace_key)
+        self.model = model
+    
+    def transform(self, request: str) -> np.ndarray:
+        vector = self.model(request)
+        return vector
+```
+
 
 # Contributing to the Dialog Flow Transitions
 

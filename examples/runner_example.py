@@ -1,15 +1,20 @@
-from df_runner import ScriptRunner
+import sys
+from pathlib import Path
+from df_runner import Pipeline, CLIMessengerInterface
+
+
+sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
 
 from examples.base_example import regex_model, script
 
-# TODO: waiting for new version of runner
-runner = ScriptRunner(
+pipeline = Pipeline.from_script(
     script,
     start_label=("root", "start"),
     fallback_label=("root", "fallback"),
-    pre_annotators=[regex_model],
-    post_annotators=[],
+    messenger_interface=CLIMessengerInterface(intro="Starting Dff bot..."),
+    context_storage={},
+    pre_services=[regex_model],
 )
 
 if __name__ == "__main__":
-    runner.start()
+    pipeline.run()

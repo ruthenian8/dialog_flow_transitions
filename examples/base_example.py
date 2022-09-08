@@ -13,8 +13,27 @@ from examples import example_utils
 
 logger = logging.getLogger(__name__)
 
-data_path = Path(__file__).parent.joinpath("data/example.yaml")
-regex_model = RegexClassifier(namespace_key="regex", model=RegexModel(Dataset.parse_yaml(data_path)))
+"""
+In order to be able to use the extended conditions, you should instantiate a matcher or a classifier.
+
+Sometimes, a dataset is required to construct the instance. 
+In those cases, you should import a dataset from a file or define it as a dictionary
+and then use the `parse_obj` method of the `Dataset` class.
+"""
+
+dataset = Dataset.parse_yaml(Path(__file__).parent.joinpath("data/example.yaml"))
+# dataset = Dataset.parse_obj({"items": [..., {"label": "greet", "samples": ["hello", "hi"]}, ...]})
+
+regex_model = RegexClassifier(namespace_key="regex", model=RegexModel(dataset))
+
+"""
+The instance of the model is a `Callable`, so you can put it directly to the PROCESSING sections
+of a dialogue graph, like you would do with regular functions.
+
+The results will be stored indside the `Context` object in the `framework_states` property.
+Conditional functions, like `has_cls_label`, will access those annotations
+and compare the predicted label probabilities to a threshold of your choice.
+"""
 
 script = {
     GLOBAL: {

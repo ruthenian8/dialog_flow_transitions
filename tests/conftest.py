@@ -28,7 +28,7 @@ def standard_model(testing_dataset):
 
 @pytest.fixture(scope="session")
 def hf_api_key():
-    yield os.getenv("HF_API_KEY") or ""
+    yield os.getenv("HF_API_KEY", "")
 
 
 @pytest.fixture(scope="session")

@@ -3,6 +3,8 @@ SHELL = /bin/bash
 VENV_PATH = venv
 VERSIONING_FILES =  setup.py makefile docs/source/conf.py df_extended_conditions/__init__.py
 CURRENT_VERSION = 0.1.0 
+IMAGE_TAG = myrasa
+CONTAINER_TAG = rasa
 
 help:
 	@echo "Thanks for your interest in Dialog Flow Framework!"
@@ -30,14 +32,31 @@ format: venv
 	$(VENV_PATH)/bin/black --exclude="setup\.py|venv\/" --line-length=120 .
 .PHONY: format
 
+start_rasa:
+
+.PHONY: start_rasa
+	docker build -t $(IMAGE_TAG) .
+	docker run -d -p 5005:5005 --name $(CONTAINER_TAG) $(IMAGE_TAG)
+await_rasa:
+	while true; do
+		CURLOUT=$$(curl -X GET localhost:5005);
+		if [[ $$CURLOUT ~= 'Hello from Rasa: 3.2.6' ]]; then
+			break;
+		fi
+		sleep 1;
+	done
+.PHONY: await_rasa
+
+stop_rasa:
+	docker stop $(CONTAINER_TAG)
+.PHONY: stop_rasa
+
 lint: venv
 	@set -e && $(VENV_PATH)/bin/black --exclude="setup\.py|venv\/" --line-length=120 --check . || ( \
 		echo "================================"; \
 		echo "Bad formatting? Run: make format"; \
 		echo "================================"; \
 		false)
-	$(VENV_PATH)/bin/mypy df_extended_conditions/
-
 .PHONY: lint
 
 test: venv

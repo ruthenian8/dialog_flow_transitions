@@ -66,6 +66,7 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     extras_require={
+        "async": ["httpx>=0.23.0"],
         "hf": ["transformers>=4.16.2", "torch>=1.7.0", "scikit-learn<=1.1.1"],
         "gensim": ["gensim>=4.0.0", "scikit-learn<=1.1.1"],
         "sklearn": ["scikit-learn<=1.1.1"],

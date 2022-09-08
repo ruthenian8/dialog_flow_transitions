@@ -1,11 +1,12 @@
 import sys
-import os
+from pathlib import Path
 import importlib
 
 import pytest
 
 # uncomment the following line, if you want to run your examples during the test suite or import from them
-sys.path.insert(0, os.pardir)
+sys.path.insert(0, str(Path(__file__).absolute().parent.parent))
+
 
 from examples.example_utils import run_test
 
@@ -17,6 +18,7 @@ from examples.example_utils import run_test
         ("examples.remote_api.rasa",),
         ("examples.remote_api.dialogflow",),
         ("examples.remote_api.hf_api",),
+        ("examples.gensim_example",),
         ("examples.sklearn_example",),
     ],
 )
